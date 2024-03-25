@@ -18,15 +18,10 @@ def drop_similar_rows(df, text_column, threshold_percentage):
                 if j not in to_drop:
                     len_i = len(texts[i])
                     len_j = len(texts[j])
-                    threshold = max(len_i, len_j) * threshold_percentage
+                    threshold = min(max(len_i, len_j) * threshold_percentage, 1)
                     if distance(texts[i], texts[j]) <= threshold:
                         to_drop.add(j)
     return df.drop(to_drop)
-
-
-def split_multi_label(examples):
-    examples["label"] = [label.split(",") for label in examples["label"]]
-    return examples
 
 
 def main():
@@ -35,7 +30,7 @@ def main():
     dataset = Dataset.from_pandas(data, preserve_index=False)
 
     # Initial rough balance to speed up de-duplicate
-    positive = dataset.filter(lambda example: example["label"] in ["PAF", "AA,PAF", "AA"])
+    positive = dataset.filter(lambda example: example["label"] == "PAF/AA")
     negative = dataset.filter(lambda example: example["label"] == "Unrelated")
     negative = negative.shuffle(seed=42)
     negative = negative.select(range(positive.num_rows * 2))
@@ -47,21 +42,20 @@ def main():
     data['text_lowercase'] = data['text'].str.lower()
     data = data.drop_duplicates(subset=['text_lowercase'], keep='first')
     data = data.reset_index(drop=True)
-    data = drop_similar_rows(data, 'text_lowercase', threshold_percentage=0.1)
+    data = drop_similar_rows(data, 'text_lowercase', threshold_percentage=0.05)
     print("Post-de-duplicate shape: ", data.shape)
     data = data.drop(columns=['text_lowercase'])
     dataset = Dataset.from_pandas(data, preserve_index=False)
 
     # Final balance
-    positive = dataset.filter(lambda example: example["label"] in ["PAF", "AA,PAF", "AA"])
+    positive = dataset.filter(lambda example: example["label"] == "PAF/AA")
     print("Positive balance length: ", len(positive))
     negative = dataset.filter(lambda example: example["label"] == "Unrelated")
     negative = negative.shuffle(seed=42)
     negative = negative.select(range(positive.num_rows))
     dataset = concatenate_datasets([positive, negative])
 
-    # Split
-    dataset = dataset.map(split_multi_label, batched=True, num_proc=8)
+    # Push
     dataset.push_to_hub("alex-miller/cdp-paf-meta")
 
 

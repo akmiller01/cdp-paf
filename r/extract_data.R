@@ -106,10 +106,13 @@ labeled_related = labeled_related[,c("text", "label")]
 meta_model_data = rbindlist(list(
   labeled_related, unique_unrelated
 ))
+# Post-rectify to binary
+meta_model_data$label[which(meta_model_data$label %in% c("AA", "PAF", "AA,PAF"))] = "PAF/AA"
 fwrite(meta_model_data, "./large_data/meta_model_data.csv")
 
 ### Examine lengths ####
 context_window = 512
-text_split = strsplit(meta_model_data$text, split=" ")
-length(which(sapply(text_split, length)>context_window))/nrow(meta_model_data)
+pos = subset(meta_model_data, label=="PAF/AA")
+text_split = strsplit(pos$text, split=" ")
+length(which(sapply(text_split, length)>context_window))/nrow(pos)
 hist(sapply(text_split, length))
