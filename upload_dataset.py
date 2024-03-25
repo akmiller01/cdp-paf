@@ -18,7 +18,7 @@ def drop_similar_rows(df, text_column, threshold_percentage):
                 if j not in to_drop:
                     len_i = len(texts[i])
                     len_j = len(texts[j])
-                    threshold = min(max(len_i, len_j) * threshold_percentage, 1)
+                    threshold = max(max(len_i, len_j) * threshold_percentage, 1)
                     if distance(texts[i], texts[j]) <= threshold:
                         to_drop.add(j)
     return df.drop(to_drop)

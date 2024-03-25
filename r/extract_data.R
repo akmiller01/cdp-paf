@@ -76,17 +76,13 @@ labeled_related = rbindlist(
 
 ### Concatenate textual columns ####
 textual_cols_for_classification = c(
+  "DonorName",
   "ProjectTitle",
   "SectorName",
   "PurposeName",
   "FlowName",
   "ShortDescription",
-  "LongDescription",
-  "DonorName",
-  "AgencyName",
-  "RecipientName",
-  "ChannelName",
-  "ChannelReportedName"
+  "LongDescription"
 )
 
 unique_unrelated = unique_unrelated %>%
