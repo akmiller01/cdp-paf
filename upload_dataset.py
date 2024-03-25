@@ -14,7 +14,9 @@ def main():
     data = pd.read_csv("./large_data/meta_model_data.csv")
 
     # De-duplicate
-    data = data.drop_duplicates(subset=['text'])
+    data['text_lowercase'] = data['text'].str.lower()
+    data = data.drop_duplicates(subset=['text_lowercase'])
+    data = data.drop(columns=['text_lowercase'])
 
     dataset = Dataset.from_pandas(data, preserve_index=False)
 
