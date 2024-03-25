@@ -81,7 +81,12 @@ textual_cols_for_classification = c(
   "PurposeName",
   "FlowName",
   "ShortDescription",
-  "LongDescription"
+  "LongDescription",
+  "DonorName",
+  "AgencyName",
+  "RecipientName",
+  "ChannelName",
+  "ChannelReportedName"
 )
 
 unique_unrelated = unique_unrelated %>%
@@ -102,3 +107,9 @@ meta_model_data = rbindlist(list(
   labeled_related, unique_unrelated
 ))
 fwrite(meta_model_data, "./large_data/meta_model_data.csv")
+
+### Examine lengths ####
+context_window = 512
+text_split = strsplit(meta_model_data$text, split=" ")
+length(which(sapply(text_split, length)>context_window))/nrow(meta_model_data)
+hist(sapply(text_split, length))
