@@ -12,8 +12,11 @@ names(crs) = gsub(" ", "", names(crs))
 
 textual_cols_for_classification = c(
   "Year",
+  "ProjectNumber",
   "RecipientName",
+  "RecipientCode",
   "DonorName",
+  "DonorCode",
   "ProjectTitle",
   "SectorName",
   "PurposeName",
