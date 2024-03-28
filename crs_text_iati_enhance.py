@@ -49,6 +49,7 @@ cols_to_remove.remove("text")
 IATI = IATI.remove_columns(cols_to_remove)
 IATI_ORG_DICT = dict()
 
+
 print("Pre-sorting IATI data by org ref...")
 disable_progress_bar()
 for reporting_org_ref in tqdm(DONOR_MAPPING_DICT.values()):
@@ -154,7 +155,6 @@ def match_crs_iati(crs_example):
         return crs_example
 
 
-
 def main():
     crs = load_dataset('alex-miller/oecd-dac-crs', split='train')
     crs = crs.filter(lambda example: example["Year"] >= 2017)
@@ -164,7 +164,6 @@ def main():
     # Push
     crs.push_to_hub("alex-miller/iati-text-enhanced-crs")
     # crs.to_csv("./large_data/iati-text-enhanced-crs.csv")
-
 
 
 if __name__ == '__main__':
