@@ -1,4 +1,4 @@
-list.of.packages <- c("data.table", "openxlsx", "tidyverse")
+list.of.packages <- c("data.table", "openxlsx", "tidyverse", "Hmisc")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(list.of.packages, require, character.only=T)
@@ -74,6 +74,23 @@ labeled_related = rbindlist(
   list(aa_not_paf, paf_not_aa, paf_and_aa)
 )
 
+### Test IATI Text merge ####
+dat = fread("./large_data/iati-text-enhanced-crs.csv")
+matches = subset(dat, iati_match_type!="")
+long = subset(matches,
+              iati_match_type=="identifier" |
+                (iati_match_type=="project title" & nchar(ProjectTitle) > 20) |
+                (iati_match_type=="short description" & nchar(ShortDescription) > 20) |
+                (iati_match_type=="long description" & nchar(LongDescription) > 20)
+)
+common_iati_enhanced_names = names(long)[which(names(long) %in% common_names)]
+common_iati_enhanced_names = c(common_iati_enhanced_names, "iati_text")
+long = long[,common_iati_enhanced_names, with=F]
+unique_unrelated = merge(unique_unrelated, long, all.x=T)
+sum(!is.na(unique_unrelated$iati_text))/nrow(unique_unrelated)
+labeled_related = merge(labeled_related, long, all.x=T)
+sum(!is.na(labeled_related$iati_text))/nrow(labeled_related)
+
 ### Concatenate textual columns ####
 textual_cols_for_classification = c(
   "DonorName",
@@ -81,8 +98,10 @@ textual_cols_for_classification = c(
   "SectorName",
   "PurposeName",
   "FlowName",
+  # "ChannelName",
   "ShortDescription",
-  "LongDescription"
+  "LongDescription",
+  "iati_text"
 )
 
 unique_unrelated = unique_unrelated %>%

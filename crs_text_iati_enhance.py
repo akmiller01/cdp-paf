@@ -118,7 +118,7 @@ def match_crs_iati(crs_example):
 
         # Project title
         project_title = crs_example["ProjectTitle"]
-        if project_title is not None and len(project_title) > 10:
+        if project_title is not None and len(project_title) > 20:
             projecttitle_match_indices = substring_matches(project_title, org_iati["text"])
             if len(projecttitle_match_indices) > 0 and len(projecttitle_match_indices) <= 5:
                 iati_match = org_iati.select(projecttitle_match_indices)
@@ -129,7 +129,7 @@ def match_crs_iati(crs_example):
 
         # Short description
         short_description = crs_example["ShortDescription"]
-        if short_description is not None and len(short_description) > 10:
+        if short_description is not None and len(short_description) > 20:
             shortdescription_match_indices = substring_matches(short_description, org_iati["text"])
             if len(shortdescription_match_indices) > 0 and len(shortdescription_match_indices) <= 5:
                 iati_match = org_iati.select(shortdescription_match_indices)
@@ -140,7 +140,7 @@ def match_crs_iati(crs_example):
 
         # Long description
         long_description = crs_example["LongDescription"]
-        if long_description is not None and len(long_description) > 10:
+        if long_description is not None and len(long_description) > 20:
             longdescription_match_indices = substring_matches(long_description, org_iati["text"])
             if len(longdescription_match_indices) > 0 and len(longdescription_match_indices) <= 5:
                 iati_match = org_iati.select(longdescription_match_indices)
