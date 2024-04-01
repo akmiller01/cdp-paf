@@ -128,6 +128,27 @@ crs = unique(crs)
 
 fwrite(crs, "./large_data/meta_model_data.csv")
 
+### Examine prevalences ####
+pos = subset(crs, labels!="Unrelated")
+neg = subset(crs, labels=="Unrelated")
+examine_set = rbind(
+  pos,
+  neg[c(1:nrow(pos)),]
+)
+unique_labels = unique(unlist(str_split(unique(examine_set$labels), pattern=",")))
+for(unique_label in unique_labels){
+  message(
+    paste0(
+      unique_label,
+      ": ",
+      round(
+        (sum(grepl(unique_label, examine_set$labels)) / nrow(examine_set)) * 100,
+      digits=4),
+      "%"
+    )
+  )
+}
+
 ### Examine lengths ####
 context_window = 512
 text_split = strsplit(crs$text, split=" ")

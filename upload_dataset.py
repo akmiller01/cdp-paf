@@ -9,12 +9,12 @@ def main():
     dataset = load_dataset("csv", data_files="./large_data/meta_model_data.csv", split='train')
 
     # Balance
-    # positive = dataset.filter(lambda example: example["labels"] != "Unrelated")
-    # print("Positive balance length: ", len(positive))
-    # negative = dataset.filter(lambda example: example["labels"] == "Unrelated")
-    # negative = negative.shuffle(seed=42)
-    # negative = negative.select(range(positive.num_rows))
-    # dataset = concatenate_datasets([positive, negative])
+    positive = dataset.filter(lambda example: example["labels"] != "Unrelated")
+    print("Positive balance length: ", len(positive))
+    negative = dataset.filter(lambda example: example["labels"] == "Unrelated")
+    negative = negative.shuffle(seed=42)
+    negative = negative.select(range(positive.num_rows))
+    dataset = concatenate_datasets([positive, negative])
 
     # Push
     dataset.push_to_hub("alex-miller/cdp-paf-meta")
