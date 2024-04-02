@@ -141,6 +141,8 @@ for(unique_label in unique_labels){
     paste0(
       unique_label,
       ": ",
+      sum(grepl(unique_label, examine_set$labels)),
+      ", ",
       round(
         (sum(grepl(unique_label, examine_set$labels)) / nrow(examine_set)) * 100,
       digits=4),
@@ -148,6 +150,9 @@ for(unique_label in unique_labels){
     )
   )
 }
+
+pos = subset(pos, labels!="Crisis financing")
+View(pos)
 
 ### Examine lengths ####
 context_window = 512
