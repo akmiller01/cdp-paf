@@ -13,6 +13,7 @@ client = OpenAI(
 )
 
 MODEL = "gpt-3.5-turbo-0125"
+MULTIPLIER = 10
 
 
 def warn_user_about_tokens(tokenizer, text):
@@ -51,20 +52,20 @@ if __name__ == '__main__':
         'PAF,Indirect,AA': ('Indirect Pre-Arranged Financing for Crises and Indirect Anticipatory Action for Humanitarian Crises','without using those words in the record'),
         'PAF,Direct,Contingent financing': ('Direct Pre-Arranged Financing for Crises and Contingent Financing','without using "pre-arranged" in the record. You may use "contingent" or "contingent finance" in the record'),
         'PAF,Direct,Indirect,AA': ('Both Direct and Indirect Pre-Arranged Financing for Crises and Direct and Indirect Anticipatory Action for Humanitarian Crises','without using those words in the record'),
-        'PAF,Direct,WB CAT DDO,Contingent financing': ('Direct Pre-Arranged Financing for Crises, World Bank Catastrophe Deferred Drawdown Option, and Contingent Financing','without using "pre-arranged" in the record. You may use "contingent", "contingent finance", "CAT DDO", or "Catastrophe Deferred Drawdown Option" in the record. You must use "World Bank" in the record.'),
+        'PAF,Direct,WB CAT DDO,Contingent financing': ('Direct Pre-Arranged Financing for Crises, World Bank Catastrophe Deferred Drawdown Option, and Contingent Financing','without using "pre-arranged" in the record. You may use "contingent", "contingent finance", "CAT DDO", or "Catastrophe Deferred Drawdown Option" in the record. You must use "International Bank for Reconstruction and Development" or "International Development Association" in the record.'),
         'PAF,Part,AA': ('Partial Pre-Arranged Financing for Crises and Partial Anticipatory Action for Humanitarian Crises','without using those words in the record'),
         'PAF,Indirect,Contingent financing': ('Indirect Pre-Arranged Financing for Crises and Contingent Financing','without using "pre-arranged" in the record. You may use "contingent" o "contingent finance" in the record'),
     }
-    system_prompt_format = "Below is a record from a database of development and humanitarian assistance. I need your help to create synthetic data to train a classifier network. Could you please write 10 synthetic records based on the example, separated by new lines, that mirrors it in length, content, vocabulary, language, and theme? The synthetic record should reflect the themes we are trying to classify, which are '{}' {}. Please only write the synthetic data and no additional text."
+    system_prompt_format = "Below is a record from a database of development and humanitarian assistance. I need your help to create synthetic data to train a classifier network. Could you please write {} synthetic records based on the example, separated by new lines, that mirrors it in length, content, vocabulary, language, and theme? The synthetic record should reflect the themes we are trying to classify, which are '{}' {}. Please only write the synthetic data and no additional text."
 
     def apply_system_prompts(example):
         categories, extra_instructions = symantic_label_mapping[example["labels"]]
-        example["system_prompt"] = system_prompt_format.format(categories, extra_instructions)
+        example["system_prompt"] = system_prompt_format.format(MULTIPLIER, categories, extra_instructions)
         return example
     
     dataset = dataset.map(apply_system_prompts, num_proc=8)
     all_prompts = " ".join(dataset["system_prompt"])
-    dataset_texts = " ".join(dataset["text"])
+    dataset_texts = " ".join(dataset["text"] * MULTIPLIER)
     all_text = all_prompts + dataset_texts
     tokenizer = tiktoken.encoding_for_model(MODEL)
 
@@ -85,6 +86,7 @@ if __name__ == '__main__':
             )
             for synthetic_text in response.choices[0].message.content.split("\n"):
                 if synthetic_text != '':
+                    import pdb; pdb.set_trace()
                     synthetic_texts.append(synthetic_text)
                     synthetic_labels.append(label)
 
