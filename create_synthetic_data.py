@@ -1,0 +1,95 @@
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
+import tiktoken
+import click
+from datasets import load_dataset
+import pandas as pd
+from tqdm import tqdm
+
+load_dotenv()
+client = OpenAI(
+    api_key = os.getenv("OPENAI_API_KEY")
+)
+
+MODEL = "gpt-3.5-turbo-0125"
+
+
+def warn_user_about_tokens(tokenizer, text):
+    token_cost = 0.5
+    cost_per = 1000000
+    token_count = len(tokenizer.encode(text))
+    return click.confirm(
+        "This will use at least {} tokens and cost at least ${} to run. Do you want to continue?".format(
+        token_count, round((token_count / cost_per) * token_cost, 4)
+    )
+    , default=False)
+
+if __name__ == '__main__':
+
+    dataset = load_dataset("alex-miller/cdp-paf-meta", split="train")
+
+    # Remove unrelated and keep only positive samples
+    dataset = dataset.filter(lambda example: example["labels"] not in ["Unrelated", "Crisis financing"])
+
+    def relabel_meta_to_multi(example):
+        all_labels = example['labels'].split(',')
+        if len(all_labels) > 1 and 'Crisis financing' in all_labels:
+            all_labels.remove('Crisis financing')
+        example['labels'] = ','.join(all_labels)
+        return example
+
+    dataset = dataset.map(relabel_meta_to_multi, num_proc=8)
+
+    # format (Symantic description of categories, extra instructions)
+    symantic_label_mapping = {
+        'PAF,Direct': ('Direct Pre-Arranged Financing for Crises', 'without using those words in the record'),
+        'PAF,Indirect': ('Indirect Pre-Arranged Financing for Crises','without using those words in the record'),
+        'PAF,Part': ('Partial Pre-Arranged Financing for Crises','without using those words in the record'),
+        'PAF,Direct,Indirect': ('Both Direct and Indirect Pre-Arranged Financing for Crises','without using those words in the record'),
+        'PAF,Direct,AA': ('Direct Pre-Arranged Financing for Crises and Direct Anticipatory Action for Humanitarian Crises','without using those words in the record'),
+        'PAF,Indirect,AA': ('Indirect Pre-Arranged Financing for Crises and Indirect Anticipatory Action for Humanitarian Crises','without using those words in the record'),
+        'PAF,Direct,Contingent financing': ('Direct Pre-Arranged Financing for Crises and Contingent Financing','without using "pre-arranged" in the record. You may use "contingent" or "contingent finance" in the record'),
+        'PAF,Direct,Indirect,AA': ('Both Direct and Indirect Pre-Arranged Financing for Crises and Direct and Indirect Anticipatory Action for Humanitarian Crises','without using those words in the record'),
+        'PAF,Direct,WB CAT DDO,Contingent financing': ('Direct Pre-Arranged Financing for Crises, World Bank Catastrophe Deferred Drawdown Option, and Contingent Financing','without using "pre-arranged" in the record. You may use "contingent", "contingent finance", "CAT DDO", or "Catastrophe Deferred Drawdown Option" in the record. You must use "World Bank" in the record.'),
+        'PAF,Part,AA': ('Partial Pre-Arranged Financing for Crises and Partial Anticipatory Action for Humanitarian Crises','without using those words in the record'),
+        'PAF,Indirect,Contingent financing': ('Indirect Pre-Arranged Financing for Crises and Contingent Financing','without using "pre-arranged" in the record. You may use "contingent" o "contingent finance" in the record'),
+    }
+    system_prompt_format = "Below is a record from a database of development and humanitarian assistance. I need your help to create synthetic data to train a classifier network. Could you please write 10 synthetic records based on the example, separated by new lines, that mirrors it in length, content, vocabulary, language, and theme? The synthetic record should reflect the themes we are trying to classify, which are '{}' {}. Please only write the synthetic data and no additional text."
+
+    def apply_system_prompts(example):
+        categories, extra_instructions = symantic_label_mapping[example["labels"]]
+        example["system_prompt"] = system_prompt_format.format(categories, extra_instructions)
+        return example
+    
+    dataset = dataset.map(apply_system_prompts, num_proc=8)
+    all_prompts = " ".join(dataset["system_prompt"])
+    dataset_texts = " ".join(dataset["text"])
+    all_text = all_prompts + dataset_texts
+    tokenizer = tiktoken.encoding_for_model(MODEL)
+
+    if warn_user_about_tokens(tokenizer, text=all_text) == True:
+        synthetic_labels = list()
+        synthetic_texts = list()
+        for i, user_prompt in tqdm(enumerate(dataset["text"])):
+            system_prompt = dataset["system_prompt"][i]
+            label = dataset["labels"][i]
+
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ]
+            response = client.chat.completions.create(
+                model=MODEL,
+                messages=messages
+            )
+            for synthetic_text in response.choices[0].message.content.split("\n"):
+                if synthetic_text != '':
+                    synthetic_texts.append(synthetic_text)
+                    synthetic_labels.append(label)
+
+        synthetic_df = pd.DataFrame({
+            'text': synthetic_texts,
+            'labels': synthetic_labels
+        })
+        synthetic_df.to_csv("./large_data/synthetic_cdp.csv")
