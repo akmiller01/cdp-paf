@@ -3,14 +3,17 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import tiktoken
 import click
-from datasets import load_dataset
-import pandas as pd
+from datasets import load_dataset, concatenate_datasets, Dataset
 from tqdm import tqdm
+from huggingface_hub import login
+
 
 load_dotenv()
 client = OpenAI(
     api_key = os.getenv("OPENAI_API_KEY")
 )
+HF_TOKEN = os.getenv('HF_TOKEN')
+login(token=HF_TOKEN)
 
 MODEL = "gpt-3.5-turbo-0125"
 MULTIPLIER = 10
@@ -42,6 +45,18 @@ if __name__ == '__main__':
 
     dataset = dataset.map(relabel_meta_to_multi, num_proc=8)
 
+    dataset = dataset.add_column("class_labels", dataset['labels'])
+
+    dataset = dataset.class_encode_column('class_labels').train_test_split(
+        test_size=0.5,
+        stratify_by_column="class_labels",
+        shuffle=True,
+        seed=42
+    )
+
+    dataset = dataset.remove_columns(["class_labels"])
+    dataset_train = dataset['train']
+
     # format (Symantic description of categories, extra instructions)
     symantic_label_mapping = {
         'PAF,Direct': ('Direct Pre-Arranged Financing for Crises', 'without using those words in the record'),
@@ -63,18 +78,18 @@ if __name__ == '__main__':
         example["system_prompt"] = system_prompt_format.format(MULTIPLIER, categories, extra_instructions)
         return example
     
-    dataset = dataset.map(apply_system_prompts, num_proc=8)
-    all_prompts = " ".join(dataset["system_prompt"])
-    dataset_texts = " ".join(dataset["text"] * MULTIPLIER)
+    dataset_train = dataset_train.map(apply_system_prompts, num_proc=8)
+    all_prompts = " ".join(dataset_train["system_prompt"])
+    dataset_texts = " ".join(dataset_train["text"] * (MULTIPLIER + 1))
     all_text = all_prompts + dataset_texts
     tokenizer = tiktoken.encoding_for_model(MODEL)
 
     if warn_user_about_tokens(tokenizer, text=all_text) == True:
         synthetic_labels = list()
         synthetic_texts = list()
-        for i, user_prompt in tqdm(enumerate(dataset["text"])):
-            system_prompt = dataset["system_prompt"][i]
-            label = dataset["labels"][i]
+        for i, user_prompt in tqdm(enumerate(dataset_train["text"]), total=dataset_train.num_rows):
+            system_prompt = dataset_train["system_prompt"][i]
+            label = dataset_train["labels"][i]
 
             messages = [
                 {"role": "system", "content": system_prompt},
@@ -92,8 +107,10 @@ if __name__ == '__main__':
             except:
                 print("Error fetching result {} from OpenAI.".format(i))
 
-        synthetic_df = pd.DataFrame({
+        synthetic_dataset = Dataset.from_dict({
             'text': synthetic_texts,
             'labels': synthetic_labels
         })
-        synthetic_df.to_csv("./large_data/synthetic_cdp.csv")
+        dataset['train'] = concatenate_datasets([dataset['train'], synthetic_dataset])
+        dataset.push_to_hub("alex-miller/cdp-paf-meta-synthetic")
+        synthetic_dataset.to_csv("./large_data/synthetic_cdp.csv")
