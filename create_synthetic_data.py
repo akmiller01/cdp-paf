@@ -80,15 +80,17 @@ if __name__ == '__main__':
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ]
-            response = client.chat.completions.create(
-                model=MODEL,
-                messages=messages
-            )
-            for synthetic_text in response.choices[0].message.content.split("\n"):
-                if synthetic_text != '':
-                    import pdb; pdb.set_trace()
-                    synthetic_texts.append(synthetic_text)
-                    synthetic_labels.append(label)
+            try:
+                response = client.chat.completions.create(
+                    model=MODEL,
+                    messages=messages
+                )
+                for synthetic_text in response.choices[0].message.content.split("\n"):
+                    if synthetic_text != '':
+                        synthetic_texts.append(synthetic_text)
+                        synthetic_labels.append(label)
+            except:
+                print("Error fetching result {} from OpenAI.".format(i))
 
         synthetic_df = pd.DataFrame({
             'text': synthetic_texts,
