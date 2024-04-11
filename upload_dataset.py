@@ -6,7 +6,10 @@ import os
 
 
 def main():
-    dataset = load_dataset("csv", data_files="./large_data/meta_model_data.csv", split='train')
+    dataset = load_dataset("csv", data_files="./large_data/meta_model_data_limited.csv", split='train')
+
+    # Remove null
+    dataset = dataset.filter(lambda example: example['text'] is not None and len(example['text']) > 0)
 
     # Balance
     positive = dataset.filter(lambda example: example["labels"] != "Unrelated")
@@ -17,7 +20,7 @@ def main():
     dataset = concatenate_datasets([positive, negative])
 
     # Push
-    dataset.push_to_hub("alex-miller/cdp-paf-meta")
+    dataset.push_to_hub("alex-miller/cdp-paf-meta-limited")
 
 
 if __name__ == '__main__':

@@ -31,7 +31,7 @@ def warn_user_about_tokens(tokenizer, text):
 
 if __name__ == '__main__':
 
-    dataset = load_dataset("alex-miller/cdp-paf-meta", split="train")
+    dataset = load_dataset("alex-miller/cdp-paf-meta-limited", split="train")
 
     # Remove unrelated and keep only positive samples
     dataset = dataset.filter(lambda example: example["labels"] not in ["Unrelated", "Crisis financing"])
@@ -112,5 +112,5 @@ if __name__ == '__main__':
             'labels': synthetic_labels
         })
         dataset['train'] = concatenate_datasets([dataset['train'], synthetic_dataset])
-        dataset.push_to_hub("alex-miller/cdp-paf-meta-synthetic")
-        synthetic_dataset.to_csv("./large_data/synthetic_cdp.csv")
+        dataset.push_to_hub("alex-miller/cdp-paf-meta-limited-synthetic")
+        synthetic_dataset.to_csv("./large_data/synthetic_cdp_limited.csv")

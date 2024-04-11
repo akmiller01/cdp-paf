@@ -94,11 +94,11 @@ setnames(crs, "direct_label.x", "direct_label")
 
 ### Concatenate textual columns ####
 textual_cols_for_classification = c(
-  "DonorName",
+  # "DonorName",
   "ProjectTitle",
-  "SectorName",
-  "PurposeName",
-  "FlowName",
+  # "SectorName",
+  # "PurposeName",
+  # "FlowName",
   # "ChannelName",
   "ShortDescription",
   "LongDescription",
@@ -126,7 +126,7 @@ crs$labels[which(crs$labels=="")] = "Unrelated"
 crs = crs[,c("text","labels")]
 crs = unique(crs)
 
-fwrite(crs, "./large_data/meta_model_data.csv")
+fwrite(crs, "./large_data/meta_model_data_limited.csv")
 
 ### Examine prevalences ####
 pos = subset(crs, labels!="Unrelated")
