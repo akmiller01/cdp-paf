@@ -8,9 +8,9 @@ from scipy.special import softmax
 import math
 
 
-CF_POSITIVE_CONFIDENCE_THRESHOLD = 0.6
-PAF_POSITIVE_CONFIDENCE_THRESHOLD = 0.6
-AA_POSITIVE_CONFIDENCE_THRESHOLD = 0.6
+CF_POSITIVE_CONFIDENCE_THRESHOLD = 0
+PAF_POSITIVE_CONFIDENCE_THRESHOLD = 0
+AA_POSITIVE_CONFIDENCE_THRESHOLD = 0
 
 
 global TOKENIZER
@@ -20,11 +20,11 @@ global MODEL_2
 global MODEL_3
 TOKENIZER = AutoTokenizer.from_pretrained('alex-miller/ODABert', model_max_length=512)
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
-MODEL_1 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-crisis-finance-classifier")
+MODEL_1 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-crisis-finance-classifier-limited")
 MODEL_1 = MODEL_1.to(DEVICE)
-MODEL_2 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-paf-classifier")
+MODEL_2 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-paf-classifier-limited")
 MODEL_2 = MODEL_2.to(DEVICE)
-MODEL_3 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-aa-classifier-synth")
+MODEL_3 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-aa-classifier-synth-limited")
 MODEL_3 = MODEL_3.to(DEVICE)
 
 
@@ -92,12 +92,12 @@ def map_columns(example):
     return example
 
 def main():
-    dataset = load_dataset('alex-miller/cdp-paf-meta', split='train')
+    dataset = load_dataset('alex-miller/cdp-paf-meta-limited', split='train')
     dataset = dataset.map(map_columns)
     print(
         'Overall accuracy: {}%'.format(round(np.mean(dataset['Correct']) * 100, ndigits=2))
     )
-    dataset.to_csv('large_data/predicted_meta_model_data.csv')
+    dataset.to_csv('predicted_meta_model_data_limited.csv')
     y_true = np.array([
         dataset['Crisis finance actual'],
         dataset['PAF actual'],
@@ -112,11 +112,11 @@ def main():
     confusion_indices = ["Actual negative", "Actual positive"]
     confusion_columns = ["Predicted negative", "Predicted positive"]
     crisis_confusion = pd.DataFrame(mcm[0], index=confusion_indices, columns=confusion_columns)
-    crisis_confusion.to_csv('data/crisis_confusion.csv')
+    crisis_confusion.to_csv('crisis_confusion_limited.csv')
     paf_confusion = pd.DataFrame(mcm[1], index=confusion_indices, columns=confusion_columns)
-    paf_confusion.to_csv('data/paf_confusion.csv')
+    paf_confusion.to_csv('paf_confusion_limited.csv')
     aa_confusion = pd.DataFrame(mcm[2], index=confusion_indices, columns=confusion_columns)
-    aa_confusion.to_csv('data/aa_confusion.csv')
+    aa_confusion.to_csv('aa_confusion_limited.csv')
     print(crisis_confusion)
     print(paf_confusion)
     print(aa_confusion)

@@ -25,7 +25,7 @@ def remap_binary(example):
     return example
 
 
-dataset = load_dataset("alex-miller/cdp-paf-meta", split="train")
+dataset = load_dataset("alex-miller/cdp-paf-meta-limited", split="train")
 dataset = dataset.filter(lambda example: example['labels'] != 'Unrelated')
 dataset = dataset.map(remap_binary, num_proc=8, remove_columns=["labels"])
 # Rebalance
@@ -62,11 +62,11 @@ model = AutoModelForSequenceClassification.from_pretrained(
 )
 
 training_args = TrainingArguments(
-    'cdp-paf-classifier',
+    'cdp-paf-classifier-limited',
     learning_rate=1e-6, # This can be tweaked depending on how loss progresses
-    per_device_train_batch_size=20, # These should be tweaked to match GPU VRAM
-    per_device_eval_batch_size=20,
-    num_train_epochs=10,
+    per_device_train_batch_size=24, # These should be tweaked to match GPU VRAM
+    per_device_eval_batch_size=24,
+    num_train_epochs=20,
     weight_decay=0.01,
     evaluation_strategy='epoch',
     save_strategy='epoch',

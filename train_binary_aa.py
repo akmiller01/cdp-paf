@@ -26,32 +26,32 @@ def remap_binary(example):
 
 
 # Raw data
-dataset = load_dataset("alex-miller/cdp-paf-meta", split="train")
-dataset = dataset.filter(lambda example: 'PAF' in example['labels'])
-dataset = dataset.map(remap_binary, num_proc=2, remove_columns=["labels"])
-positive = dataset.filter(lambda example: example["label"] == 1)
-negative = dataset.filter(lambda example: example["label"] == 0)
-negative = negative.shuffle(seed=42)
-negative = negative.select(range(positive.num_rows))
-dataset = concatenate_datasets([negative, positive])
-dataset = dataset.class_encode_column('label').train_test_split(
-    test_size=0.2,
-    stratify_by_column="label",
-    shuffle=True,
-    seed=42
-)
-
-# Synthetic data
-# dataset = load_dataset("alex-miller/cdp-paf-meta-synthetic")
-# dataset = dataset.filter(lambda example: len(example["text"]) > 5)
+# dataset = load_dataset("alex-miller/cdp-paf-meta-limited", split="train")
+# dataset = dataset.filter(lambda example: 'PAF' in example['labels'])
 # dataset = dataset.map(remap_binary, num_proc=2, remove_columns=["labels"])
 # positive = dataset.filter(lambda example: example["label"] == 1)
 # negative = dataset.filter(lambda example: example["label"] == 0)
 # negative = negative.shuffle(seed=42)
-# negative['train'] = negative['train'].select(range(positive['train'].num_rows))
-# negative['test'] = negative['test'].select(range(positive['test'].num_rows))
-# dataset['train'] = concatenate_datasets([negative['train'], positive['train']])
-# dataset['test'] = concatenate_datasets([negative['test'], positive['test']])
+# negative = negative.select(range(positive.num_rows))
+# dataset = concatenate_datasets([negative, positive])
+# dataset = dataset.class_encode_column('label').train_test_split(
+#     test_size=0.2,
+#     stratify_by_column="label",
+#     shuffle=True,
+#     seed=42
+# )
+
+# Synthetic data
+dataset = load_dataset("alex-miller/cdp-paf-meta-limited-synthetic")
+dataset = dataset.filter(lambda example: len(example["text"]) > 5)
+dataset = dataset.map(remap_binary, num_proc=2, remove_columns=["labels"])
+positive = dataset.filter(lambda example: example["label"] == 1)
+negative = dataset.filter(lambda example: example["label"] == 0)
+negative = negative.shuffle(seed=42)
+negative['train'] = negative['train'].select(range(positive['train'].num_rows))
+negative['test'] = negative['test'].select(range(positive['test'].num_rows))
+dataset['train'] = concatenate_datasets([negative['train'], positive['train']])
+dataset['test'] = concatenate_datasets([negative['test'], positive['test']])
 
 
 card = "alex-miller/ODABert"
@@ -75,11 +75,11 @@ model = AutoModelForSequenceClassification.from_pretrained(
 )
 
 training_args = TrainingArguments(
-    'cdp-aa-classifier',
+    'cdp-aa-classifier-synth-limited',
     learning_rate=1e-6, # This can be tweaked depending on how loss progresses
-    per_device_train_batch_size=16, # These should be tweaked to match GPU VRAM
-    per_device_eval_batch_size=16,
-    num_train_epochs=10,
+    per_device_train_batch_size=24, # These should be tweaked to match GPU VRAM
+    per_device_eval_batch_size=24,
+    num_train_epochs=20,
     weight_decay=0.01,
     evaluation_strategy='epoch',
     save_strategy='epoch',
