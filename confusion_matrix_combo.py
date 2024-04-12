@@ -74,7 +74,7 @@ def map_columns(example):
         model_1_pred, model_1_conf = inference(MODEL_1, inputs, 'Crisis finance')
         predictions['Crisis finance'][0] = predictions['Crisis finance'][0] or ((model_1_pred == 'Crisis finance') and model_1_conf > CF_POSITIVE_CONFIDENCE_THRESHOLD)
         predictions['Crisis finance'][1] = max(predictions['Crisis finance'][1], model_1_conf)
-    if predictions['Crisis finance'][0] == 'Crisis finance':
+    if predictions['Crisis finance'][0]:
         limited_text_chunks = chunk_by_tokens(example['limited_text'])
         for text_chunk in limited_text_chunks:
             inputs = TOKENIZER(text_chunk, return_tensors="pt", truncation=True).to(DEVICE)
