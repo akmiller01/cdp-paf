@@ -20,7 +20,7 @@ global MODEL_2
 global MODEL_3
 TOKENIZER = AutoTokenizer.from_pretrained('alex-miller/ODABert', model_max_length=512)
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
-MODEL_1 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-crisis-finance-classifier-limited")
+MODEL_1 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-crisis-finance-classifier")
 MODEL_1 = MODEL_1.to(DEVICE)
 MODEL_2 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-paf-classifier-limited")
 MODEL_2 = MODEL_2.to(DEVICE)
@@ -92,7 +92,7 @@ def map_columns(example):
     return example
 
 def main():
-    dataset = load_dataset('alex-miller/cdp-paf-meta-limited', split='train')
+    dataset = load_dataset('alex-miller/cdp-paf-meta', split='train')
     dataset = dataset.map(map_columns)
     print(
         'Overall accuracy: {}%'.format(round(np.mean(dataset['Correct']) * 100, ndigits=2))

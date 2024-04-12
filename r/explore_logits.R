@@ -37,7 +37,7 @@ quick_summ_stat = function(vector){
   )
 }
 
-dat = fread("large_data/predicted_meta_model_data_colab.csv")
+dat = fread("large_data/predicted_meta_model_data_combo.csv")
 
 quick_summ_stat(dat$`Crisis finance confidence`)
 quick_summ_stat(dat$`PAF confidence`)
