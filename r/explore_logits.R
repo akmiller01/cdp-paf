@@ -40,35 +40,50 @@ quick_summ_stat = function(vector){
 dat = fread("large_data/predicted_meta_model_data_combo.csv")
 
 quick_summ_stat(dat$`Crisis finance confidence`)
+plot(density(dat$`Crisis finance confidence`))
 quick_summ_stat(dat$`PAF confidence`)
+plot(density(dat$`PAF confidence`))
 quick_summ_stat(dat$`AA confidence`)
+plot(density(dat$`AA confidence`))
 
-# Cut-off of ~0.6 is free
+
 cf_true = subset(dat, `Crisis finance actual`)
 quick_summ_stat(cf_true$`Crisis finance confidence`)
-# Min 0.63
+plot(density(cf_true$`Crisis finance confidence`))
+
 cf_false_positive = subset(dat, !`Crisis finance actual` & `Crisis finance predicted`)
 quick_summ_stat(cf_false_positive$`Crisis finance confidence`)
-# Min 0.52
+plot(density(cf_false_positive$`Crisis finance confidence`))
+
 cf_false_negative = subset(dat, `Crisis finance actual` & !`Crisis finance predicted`)
 quick_summ_stat(cf_false_negative$`Crisis finance confidence`)
+plot(density(cf_false_negative$`Crisis finance confidence`))
 
-# Cut-off of ~0.6 is free, 0.85 should lose 5% of true in exchange for mean of false
+
 paf_true = subset(dat, `PAF actual`)
 quick_summ_stat(paf_true$`PAF confidence`)
-# Min 0.63
+plot(density(paf_true$`PAF confidence`))
+
 paf_false_positive = subset(dat, !`PAF actual` & `PAF predicted`)
 quick_summ_stat(paf_false_positive$`PAF confidence`)
-# Min 0.50
+plot(density(paf_false_positive$`PAF confidence`))
+paf_false_positive = paf_false_positive[order(-paf_false_positive$`PAF confidence`),]
+paf_false_positive$limited_text[1]
+
 paf_false_negative = subset(dat, `PAF actual` & !`PAF predicted`)
 quick_summ_stat(paf_false_negative$`PAF confidence`)
+plot(density(paf_false_negative$`PAF confidence`))
 
-# 0.60 is free.
+
 aa_true = subset(dat, `AA actual`)
 quick_summ_stat(aa_true$`AA confidence`)
-# Min 0.67
+plot(density(aa_true$`AA confidence`))
+
 aa_false_positive = subset(dat, !`AA actual` & `AA predicted`)
 quick_summ_stat(aa_false_positive$`AA confidence`)
-# Min 0.50
+plot(density(aa_false_positive$`AA confidence`))
+
 aa_false_negative = subset(dat, `AA actual` & !`AA predicted`)
 quick_summ_stat(aa_false_negative$`AA confidence`)
+plot(density(aa_false_negative$`AA confidence`))
+
