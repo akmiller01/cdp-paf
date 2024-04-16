@@ -84,6 +84,7 @@ def main():
 
     with open('models/xgb.pkl', 'rb') as f:
         cf_xgb, paf_xgb, aa_xgb, dummy_cols = pickle.load(f)
+    dummy_dim = len(dummy_cols)
 
     for dummy_col in dummy_cols:
         crs_sample[dummy_col] = crs_sample.get(dummy_col, 0)
@@ -95,14 +96,21 @@ def main():
         for key_name in predictions.keys():
             row[key_name + ' confidence'] = predictions[key_name][1]
         cf_X = row[['Crisis finance confidence'] + dummy_cols].values.astype('float')
-        cf_pred =  cf_xgb.predict(np.reshape(cf_X, (1, 437)))[0] == 1
-        paf_X = row[['PAF confidence'] + dummy_cols].values.astype('float')
-        paf_pred =  paf_xgb.predict(np.reshape(paf_X, (1, 437)))[0] == 1
-        aa_X = row[['AA confidence'] + dummy_cols].values.astype('float')
-        aa_pred =  aa_xgb.predict(np.reshape(aa_X, (1, 437)))[0] == 1
+        cf_pred =  cf_xgb.predict(np.reshape(cf_X, (1, dummy_dim + 1)))[0] == 1
+        cf_pred_prob = cf_xgb.predict_proba(np.reshape(cf_X, (1, dummy_dim + 1)))[0]
+        paf_X = row[['Crisis finance confidence', 'PAF confidence'] + dummy_cols].values.astype('float')
+        paf_pred =  paf_xgb.predict(np.reshape(paf_X, (1, dummy_dim + 2)))[0] == 1
+        paf_pred_prob =  paf_xgb.predict_proba(np.reshape(paf_X, (1, dummy_dim + 2)))[0] == 1
+        aa_X = row[['Crisis finance confidence', 'PAF confidence', 'AA confidence'] + dummy_cols].values.astype('float')
+        aa_pred =  aa_xgb.predict(np.reshape(aa_X, (1, dummy_dim + 3)))[0] == 1
+        aa_pred_prob =  aa_xgb.predict_proba(np.reshape(aa_X, (1, dummy_dim + 3)))[0] == 1
         print(row["full_text"][:100])
         print(predictions)
-        print(cf_pred, paf_pred, aa_pred)
+        print(
+            "CF: {}; Prob: {}\nPAF: {}; Prob: {}\nAA: {}; Prob: {}\n".format(
+                cf_pred, cf_pred_prob, paf_pred, paf_pred_prob, aa_pred, aa_pred_prob
+            )
+            )
 
 
 if __name__ == '__main__':
