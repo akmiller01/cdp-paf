@@ -107,7 +107,10 @@ def match_crs_iati(crs_example):
         # Project number
         project_number = crs_example["ProjectNumber"]
         if project_number is not None:
-            theoretical_iati_identifier = "{}-{}".format(reporting_org_ref, project_number)
+            if project_number.startswith(reporting_org_ref):
+                theoretical_iati_identifier = project_number
+            else:
+                theoretical_iati_identifier = "{}-{}".format(reporting_org_ref, project_number)
             projectnumber_match_indices = substring_matches(theoretical_iati_identifier, org_iati["iati_identifier"])
             if len(projectnumber_match_indices) > 0 and len(projectnumber_match_indices) <= 5:
                 iati_match = org_iati.select(projectnumber_match_indices)
@@ -163,7 +166,7 @@ def main():
 
     # Push
     crs.push_to_hub("alex-miller/iati-text-enhanced-crs")
-    # crs.to_csv("./large_data/iati-text-enhanced-crs.csv")
+    crs.to_csv("./large_data/iati-text-enhanced-crs.csv")
 
 
 if __name__ == '__main__':
