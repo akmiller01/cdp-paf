@@ -39,7 +39,7 @@ print("Precision: ", precision_score(dataset['AA actual'], dataset['AA predicted
 
 pre_dum_cols = dataset.columns.values.tolist()
 
-dataset = pd.get_dummies(dataset, columns=["DonorName", "SectorName", "PurposeName", "FlowName"], dtype=float)
+dataset = pd.get_dummies(dataset, columns=["DonorName", "SectorName", "PurposeName", "FlowName", "ChannelName"], dtype=float)
 post_dum_cols = dataset.columns.values.tolist()
 
 dummy_cols = [col for col in post_dum_cols if col not in pre_dum_cols]
@@ -57,7 +57,7 @@ aa_y = dataset.pop('AA actual').values.astype(float)
 X_train, X_test, y_train, y_test = train_test_split(cf_X, cf_y, test_size=0.5, shuffle=True, random_state=0)
 
 xgb_reg = xgb.XGBClassifier(n_estimators=100)
-grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=1, cv=2)
+grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=4, cv=2)
 grid.fit(X_train, y_train)
 y_pred_xgb = grid.predict(X_test)
 
@@ -78,7 +78,7 @@ print(grid.best_params_)
 X_train, X_test, y_train, y_test = train_test_split(paf_X, paf_y, test_size=0.5, shuffle=True, random_state=0)
 
 xgb_reg = xgb.XGBClassifier(n_estimators=100)
-grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=1, cv=2)
+grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=4, cv=2)
 grid.fit(X_train, y_train)
 y_pred_xgb = grid.predict(X_test)
 
@@ -99,7 +99,7 @@ paf_params = grid.best_params_
 X_train, X_test, y_train, y_test = train_test_split(aa_X, aa_y, test_size=0.5, shuffle=True, random_state=0)
 
 xgb_reg = xgb.XGBClassifier(n_estimators=100)
-grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=1, cv=2)
+grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=4, cv=2)
 grid.fit(X_train, y_train)
 y_pred_xgb = grid.predict(X_test)
 

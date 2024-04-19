@@ -80,7 +80,7 @@ def map_columns(example):
 def main():
     crs = pd.read_csv('large_data/meta_model_for_xgboost.csv')
     crs_sample = crs.sample(n=10)
-    crs_sample = pd.get_dummies(crs_sample, columns=["DonorName", "SectorName", "PurposeName", "FlowName"], dtype=float)
+    crs_sample = pd.get_dummies(crs_sample, columns=["DonorName", "SectorName", "PurposeName", "FlowName", "ChannelName"], dtype=float)
 
     with open('models/xgb.pkl', 'rb') as f:
         cf_xgb, paf_xgb, aa_xgb, dummy_cols = pickle.load(f)
@@ -100,10 +100,10 @@ def main():
         cf_pred_prob = cf_xgb.predict_proba(np.reshape(cf_X, (1, dummy_dim + 1)))[0]
         paf_X = row[['Crisis finance confidence', 'PAF confidence'] + dummy_cols].values.astype('float')
         paf_pred =  paf_xgb.predict(np.reshape(paf_X, (1, dummy_dim + 2)))[0] == 1
-        paf_pred_prob =  paf_xgb.predict_proba(np.reshape(paf_X, (1, dummy_dim + 2)))[0] == 1
+        paf_pred_prob =  paf_xgb.predict_proba(np.reshape(paf_X, (1, dummy_dim + 2)))[0]
         aa_X = row[['Crisis finance confidence', 'PAF confidence', 'AA confidence'] + dummy_cols].values.astype('float')
         aa_pred =  aa_xgb.predict(np.reshape(aa_X, (1, dummy_dim + 3)))[0] == 1
-        aa_pred_prob =  aa_xgb.predict_proba(np.reshape(aa_X, (1, dummy_dim + 3)))[0] == 1
+        aa_pred_prob =  aa_xgb.predict_proba(np.reshape(aa_X, (1, dummy_dim + 3)))[0]
         print(row["full_text"][:100])
         print(predictions)
         print(

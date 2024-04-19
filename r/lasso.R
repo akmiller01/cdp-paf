@@ -120,7 +120,8 @@ keep_for_xgboost = c(
   "DonorName",
   "SectorName",
   "PurposeName",
-  "FlowName"
+  "FlowName",
+  "ChannelName"
 )
 crs_xgboost = crs[,keep_for_xgboost]
 fwrite(crs_xgboost, "large_data/meta_model_for_xgboost.csv")
@@ -149,8 +150,9 @@ dat$DonorName = factor(dat$DonorName)
 dat$SectorName = factor(dat$SectorName)
 dat$PurposeName = factor(dat$PurposeName)
 dat$FlowName = factor(dat$FlowName)
+dat$ChannelName = factor(dat$ChannelName)
 fit = glm(
-  `AA actual`~`AA confidence`+DonorName+SectorName+PurposeName+FlowName
+  `Crisis finance actual`~`Crisis finance confidence`+DonorName+SectorName+PurposeName+FlowName+ChannelName
   , data=dat)
 summary(fit)
 1 - fit$deviance/fit$null.deviance
