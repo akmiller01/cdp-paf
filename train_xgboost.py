@@ -2,15 +2,14 @@ from sklearn.metrics import confusion_matrix
 import pandas as pd
 import xgboost as xgb
 import pickle
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 params = {
-    'min_child_weight': [1, 5, 10],
-    'gamma': [0.5, 1, 1.5, 2, 5],
-    'subsample': [0.6, 0.8, 1.0],
-    'colsample_bytree': [0.6, 0.8, 1.0],
-    'max_depth': [3, 4, 5]
+    'colsample_bytree': [0.4, 0.6, 0.8, 1.0],
+    'gamma': [0.05, 0.1, 0.2, 0.5, 0.8, 1],
+    'max_depth': [4, 5, 6],
+    'subsample': [0.2, 0.4, 0.6, 0.8, 1.0],
     }
 
 confusion_indices = ["Actual negative", "Actual positive"]
@@ -58,9 +57,9 @@ aa_y = dataset.pop('AA actual').values.astype(float)
 X_train, X_test, y_train, y_test = train_test_split(cf_X, cf_y, test_size=0.5, shuffle=True, random_state=0)
 
 xgb_reg = xgb.XGBClassifier(n_estimators=100)
-random_search = RandomizedSearchCV(xgb_reg, param_distributions=params, n_iter=5, scoring='f1', n_jobs=4, cv=2, random_state=1001)
-random_search.fit(X_train, y_train)
-y_pred_xgb = random_search.predict(X_test)
+grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=1, cv=2)
+grid.fit(X_train, y_train)
+y_pred_xgb = grid.predict(X_test)
 
 acc_xgb = accuracy_score(y_test, y_pred_xgb)
 prec_xgb = precision_score(y_test, y_pred_xgb)
@@ -73,15 +72,15 @@ mcm = confusion_matrix(y_test, y_pred_xgb)
 crisis_confusion = pd.DataFrame(mcm, index=confusion_indices, columns=confusion_columns)
 crisis_confusion.to_csv('data/crisis_confusion_xgb.csv')
 print(crisis_confusion)
-cf_params = random_search.best_params_
-print(random_search.best_params_)
+cf_params = grid.best_params_
+print(grid.best_params_)
 
 X_train, X_test, y_train, y_test = train_test_split(paf_X, paf_y, test_size=0.5, shuffle=True, random_state=0)
 
 xgb_reg = xgb.XGBClassifier(n_estimators=100)
-random_search = RandomizedSearchCV(xgb_reg, param_distributions=params, n_iter=5, scoring='f1', n_jobs=4, cv=2, random_state=1001)
-random_search.fit(X_train, y_train)
-y_pred_xgb = random_search.predict(X_test)
+grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=1, cv=2)
+grid.fit(X_train, y_train)
+y_pred_xgb = grid.predict(X_test)
 
 acc_xgb = accuracy_score(y_test, y_pred_xgb)
 prec_xgb = precision_score(y_test, y_pred_xgb)
@@ -94,15 +93,15 @@ mcm = confusion_matrix(y_test, y_pred_xgb)
 paf_confusion = pd.DataFrame(mcm, index=confusion_indices, columns=confusion_columns)
 paf_confusion.to_csv('data/paf_confusion_xgb.csv')
 print(paf_confusion)
-print(random_search.best_params_)
-paf_params = random_search.best_params_
+print(grid.best_params_)
+paf_params = grid.best_params_
 
 X_train, X_test, y_train, y_test = train_test_split(aa_X, aa_y, test_size=0.5, shuffle=True, random_state=0)
 
 xgb_reg = xgb.XGBClassifier(n_estimators=100)
-random_search = RandomizedSearchCV(xgb_reg, param_distributions=params, n_iter=5, scoring='f1', n_jobs=4, cv=2, random_state=1001)
-random_search.fit(X_train, y_train)
-y_pred_xgb = random_search.predict(X_test)
+grid = GridSearchCV(xgb_reg, param_grid=params, scoring='f1', n_jobs=1, cv=2)
+grid.fit(X_train, y_train)
+y_pred_xgb = grid.predict(X_test)
 
 acc_xgb = accuracy_score(y_test, y_pred_xgb)
 prec_xgb = precision_score(y_test, y_pred_xgb)
@@ -115,8 +114,8 @@ mcm = confusion_matrix(y_test, y_pred_xgb)
 aa_confusion = pd.DataFrame(mcm, index=confusion_indices, columns=confusion_columns)
 aa_confusion.to_csv('data/aa_confusion_xgb.csv')
 print(aa_confusion)
-print(random_search.best_params_)
-aa_params = random_search.best_params_
+print(grid.best_params_)
+aa_params = grid.best_params_
 
 cf_xgb = xgb.XGBClassifier(n_estimators=100, **cf_params)
 cf_xgb.fit(cf_X, cf_y)

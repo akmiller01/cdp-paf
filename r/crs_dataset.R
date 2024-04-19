@@ -21,6 +21,7 @@ textual_cols_for_classification = c(
   "SectorName",
   "PurposeName",
   "FlowName",
+  "ChannelName",
   "ShortDescription",
   "LongDescription"
 )
