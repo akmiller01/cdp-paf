@@ -38,11 +38,14 @@ print("Recall: ", recall_score(dataset['AA actual'], dataset['AA predicted']))
 print("Precision: ", precision_score(dataset['AA actual'], dataset['AA predicted']))
 
 pre_dum_cols = dataset.columns.values.tolist()
-
-dataset = pd.get_dummies(dataset, columns=["DonorName", "SectorName", "PurposeName", "FlowName", "ChannelName"], dtype=float)
+dataset = pd.get_dummies(dataset, columns=["DonorName", "SectorName", "PurposeName", "FlowName", "ChannelName"], dummy_na=True, dtype=float)
 post_dum_cols = dataset.columns.values.tolist()
-
 dummy_cols = [col for col in post_dum_cols if col not in pre_dum_cols]
+
+# cf_dummy_cols = pd.read_csv("data/cf_coefficients.csv")["variable"].values.tolist()
+# paf_dummy_cols = pd.read_csv("data/paf_coefficients.csv")["variable"].values.tolist()
+# aa_dummy_cols = pd.read_csv("data/aa_coefficients.csv")["variable"].values.tolist()
+
 cf_X_cols = ['Crisis finance confidence'] + dummy_cols
 paf_X_cols = ['Crisis finance confidence', "PAF confidence"] + dummy_cols
 aa_X_cols = ['Crisis finance confidence', "PAF confidence", "AA confidence"] + dummy_cols

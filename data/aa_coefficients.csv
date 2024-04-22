@@ -1,0 +1,218 @@
+variable,beta
+DonorName_Adaptation Fund,0.0142782346753433
+DonorName_Asian Development Bank,0.00802223466037201
+DonorName_Asian Infrastructure Investment Bank,0.00549975993506437
+DonorName_Australia,-0.0120342807481898
+DonorName_Austria,-0.104843963580149
+DonorName_Belgium,-0.126272499879931
+DonorName_Bill & Melinda Gates Foundation,0.0192763412379021
+DonorName_Bulgaria,-0.0680345834803705
+DonorName_Canada,0.218468959410912
+DonorName_Caribbean Development Bank,0.0211266817873934
+DonorName_Central Emergency Response Fund,0.568568607047145
+DonorName_Citi Foundation,-0.239223491601894
+DonorName_Climate Investment Funds,0.0523487234729409
+DonorName_Conrad N. Hilton Foundation,-0.11729877129289
+DonorName_Council of Europe Development Bank,-0.0173545374923935
+DonorName_Czech Republic,0.0225725715984067
+DonorName_Denmark,0.0672054819769449
+DonorName_Estonia,-0.120585691220698
+DonorName_EU Institutions,-0.0299414675097291
+DonorName_European Bank for Reconstruction and Development,0.0147071174322803
+DonorName_Finland,-0.00800221485222819
+DonorName_France,0.00558337939821166
+DonorName_Germany,0.0359919458473078
+DonorName_Global Environment Facility,-0.00621135983480522
+DonorName_Global Green Growth Institute,0.0283429683121691
+DonorName_Gordon and Betty Moore Foundation,-0.0627377870360416
+DonorName_Green Climate Fund,0.0196169533005338
+DonorName_Hungary,-0.011120116797868
+DonorName_Iceland,-0.0463240131441648
+DonorName_IKEA Foundation,0.881992698184726
+DonorName_Inter-American Development Bank,0.0117164885591927
+DonorName_International Bank for Reconstruction and Development,-0.0226267960751217
+DonorName_International Development Association,-0.0109294987927234
+DonorName_International Finance Corporation,0.00578093293861397
+DonorName_Ireland,-0.0103343687753782
+DonorName_Islamic Development Bank,0.031755045017026
+DonorName_Italy,-0.044292497905758
+DonorName_Japan,-0.0405498601158946
+DonorName_Korea,0.00803482576978662
+DonorName_Laudes Foundation,0.00418990907247846
+DonorName_Luxembourg,-0.061616725539773
+DonorName_Margaret A. Cargill Foundation,-0.0825132154976427
+DonorName_Mastercard Foundation,0.0147016745910745
+DonorName_Netherlands,-0.0457885774986667
+DonorName_New Zealand,-0.0387167196838471
+DonorName_Nordic Development Fund,0.000613721815161713
+DonorName_Norway,0.000327138865332692
+DonorName_Poland,-0.0778428453347391
+DonorName_Rockefeller Foundation,-0.0756968301552362
+DonorName_Spain,-0.0401199681431047
+DonorName_Sweden,0.0031271000600898
+DonorName_Switzerland,-0.0402474800801137
+DonorName_Thailand,0.0402098864921513
+DonorName_UNICEF,-0.150366110090849
+DonorName_United Kingdom,0.0427869936518583
+DonorName_United States,-0.0624856833325453
+DonorName_Wellcome Trust,0.0386856027613457
+"SectorName_I.1.a. Education, Level Unspecified",-0.00253916739643718
+SectorName_I.1.b. Basic Education,-0.191142042045658
+SectorName_I.4. Water Supply & Sanitation,0.0023790332440516
+SectorName_II.1. Transport & Storage,0.000345832643052452
+SectorName_II.4. Banking & Financial Services,-0.00305798008499125
+SectorName_IX. Unallocated / Unspecified,0.0641852231836124
+SectorName_VI.2. Development Food Assistance,-0.0110580086356576
+SectorName_VIII.1. Emergency Response,0.0547724167678701
+SectorName_VIII.2. Reconstruction Relief & Rehabilitation,-0.00565347198646949
+SectorName_VIII.3. Disaster Prevention & Preparedness,0.0529352043971005
+PurposeName_Advanced technical and managerial training,0.454730488391882
+PurposeName_Agricultural development,-0.059059091758068
+PurposeName_Agricultural extension,-0.480401486311616
+PurposeName_Agricultural financial services,0.0370182504183824
+PurposeName_Agricultural policy and administrative management,0.00599321772067727
+PurposeName_Agricultural services,-0.00806900178348648
+PurposeName_Basic drinking water supply and basic sanitation,-0.0581717946657474
+PurposeName_Basic nutrition,-0.0566239660785379
+PurposeName_Basic sanitation,0.0139113858707332
+PurposeName_Biodiversity,-0.0349528248678039
+"PurposeName_Civilian peace-building, conflict prevention and resolution",-0.0101824146068418
+PurposeName_COVID-19 control,-0.0408663463405323
+PurposeName_Disaster Risk Reduction,-0.0176674648213876
+PurposeName_Domestic revenue mobilisation,0.00800087498914292
+PurposeName_Education policy and administrative management,-0.0316680500143152
+PurposeName_Education/training in banking and financial services,-0.14037134653431
+PurposeName_Emergency food assistance,0.151408192968544
+PurposeName_Employment creation,0.0222107224528253
+"PurposeName_Energy generation, renewable sources - multiple technologies",0.0112041554761699
+PurposeName_Environmental education/training,-0.129588805015452
+PurposeName_Environmental policy and administrative management,-0.0283533224469388
+PurposeName_Environmental research,0.183283657688865
+"PurposeName_Facilitation of orderly, safe, regular and responsible migration and mobili",0.00289149294993958
+PurposeName_Family planning,0.0995515858884822
+PurposeName_Fishery research,-0.182728800505354
+PurposeName_Food assistance,-0.00514006880048103
+PurposeName_Food crop production,-0.15224306834541
+PurposeName_Food security policy and administrative management,-0.138555990371386
+PurposeName_Formal sector financial intermediaries,-0.00483540900147224
+PurposeName_Health education,-0.0940276832439334
+PurposeName_Health policy and administrative management,-0.00392256017766449
+PurposeName_Immediate post-emergency reconstruction and rehabilitation,-0.00117406118385621
+PurposeName_Infectious disease control,0.000140162513788411
+PurposeName_Informal/semi-formal financial intermediaries,-0.00833255978224546
+PurposeName_Macroeconomic policy,-0.0894546287064787
+PurposeName_Malaria control,-0.00728226553317251
+PurposeName_Material relief assistance and services,0.09254004124355
+PurposeName_Medical research,-0.0266630904296557
+PurposeName_Medical services,0.00838918059133649
+PurposeName_Multi-hazard response preparedness,0.0051117958093741
+PurposeName_Multisector aid,0.0261270739756429
+PurposeName_Multisector education/training,0.169246019146327
+PurposeName_Population policy and administrative management,0.0106629184281682
+PurposeName_Public finance management (PFM),-0.00570661946502488
+PurposeName_Public Procurement,0.0055245886151351
+PurposeName_Public sector policy and administrative management,0.00463219159898661
+PurposeName_Reintegration and SALW control,0.0126922515190104
+PurposeName_Removal of land mines and explosive remnants of war,0.00793460508134149
+PurposeName_River basins development,0.0265892439832652
+PurposeName_Rural development,0.00696870682464674
+PurposeName_Sectors not specified,0.000511246567112943
+PurposeName_Security system management and reform,0.0416354368863259
+PurposeName_Site preservation,-0.0133720161655006
+PurposeName_Social Protection,-0.00427462808735832
+PurposeName_Statistical capacity building,0.00293966355274907
+PurposeName_Technological research and development,-0.016368771250712
+PurposeName_Tuberculosis control,0.0632539419768573
+PurposeName_Urban development and management,0.00368820842833821
+PurposeName_Water resources conservation (including data collection),0.00107758897826738
+PurposeName_Water sector policy and administrative management,-0.00312338239205192
+PurposeName_Water supply and sanitation - large systems,0.0424177179029998
+"PurposeName_Women's rights organisations and movements, and government institutions",-0.0134944710082422
+FlowName_Equity Investment,0.048912927449689
+FlowName_ODA Grants,-0.00458158383011134
+ChannelName_African Development Bank,-0.0281935725057151
+ChannelName_African Risk Capacity Group,0.0710007890754941
+ChannelName_Asian Development Bank,-0.0589257230484511
+ChannelName_Asian Development Fund,0.0168498335373282
+ChannelName_Banks (deposit taking corporations except Micro Finance Institutions),-0.0283591986608218
+ChannelName_Black Sea Trade and Development Bank,0.100051135490005
+ChannelName_Caribbean Development Bank,-0.135665162613658
+ChannelName_Catastrophe Containment and Relief Trust,0.0218373893230177
+ChannelName_Central American Bank for Economic Integration,0.028006610687026
+ChannelName_Central Emergency Response Fund,-0.011967674170647
+ChannelName_Central Government,0.0193333303314806
+ChannelName_Coalition for Epidemic Preparedness Innovations,0.0232525865301777
+ChannelName_Development Bank of Latin America,0.0120845911234363
+ChannelName_Doctors Without Borders,-0.16419783847412
+ChannelName_Donor country-based NGO,0.13488756300488
+ChannelName_Donor Government,-0.0202159564884202
+ChannelName_Economic Community of West African States,0.0280331314871312
+ChannelName_European Bank for Reconstruction and Development,0.0203409546099741
+ChannelName_European Bank for Reconstruction and Development - technical co-operation and special funds (ODA-eligible countries only),0.0538824995272348
+ChannelName_European Commission - European Development Fund,0.0200846049708762
+ChannelName_European Investment Bank,0.0299012951887589
+ChannelName_European Union Institutions,-0.031334560234784
+ChannelName_Food and Agricultural Organisation,0.665698040694633
+ChannelName_Geneva International Centre for Humanitarian Demining,0.00537416433366555
+ChannelName_Global Alliance for Vaccines and Immunization,-0.0974261750149947
+ChannelName_Global Development Network,-0.00348831087807698
+"ChannelName_Global Fund to Fight AIDS, Tuberculosis and Malaria",-0.0419057634987703
+"ChannelName_Holding companies, trusts and Special Purpose Vehicles",0.00948286038807262
+"ChannelName_Inter-American Development Bank, Inter-American Investment Corporation and Multilateral Investment Fund",0.0178782127028533
+ChannelName_International Bank for Reconstruction and Development,-0.0303109456690678
+"ChannelName_International Centre for Diarrhoeal Disease Research, Bangladesh",0.00396744458803849
+ChannelName_International Committee of the Red Cross,-0.00700286189938427
+ChannelName_International Federation of Red Cross and Red Crescent Societies,-0.0440192248823382
+ChannelName_International Finance Corporation,-0.000532809821599806
+ChannelName_International Finance Facility for Immunisation,0.0102285412504921
+ChannelName_International Fund for Agricultural Development,-0.171607953140603
+ChannelName_International Institute for Sustainable Development,-0.0418973412492618
+ChannelName_International Monetary Fund - Poverty Reduction and Growth Trust,-0.00826881093076452
+ChannelName_International Monetary Fund - Subsidization of Emergency Post Conflict Assistance/Emergency Assistance for Natural Disasters for PRGT-eligible members,0.098706595705785
+ChannelName_International Monetary Fund (IMF),0.0115897143007752
+ChannelName_International NGO,-0.0308969920799846
+ChannelName_International Organisation for Migration,0.174558439508654
+ChannelName_International Water Management Institute,0.0674443605488107
+ChannelName_Local Government,5.86535669895101e-05
+ChannelName_Organisation of American States,0.00109873936822619
+ChannelName_Other,-0.022039873066746
+ChannelName_Other multilateral institutions,-0.0450585060952882
+ChannelName_Other non-financial corporations,-0.0158132321249887
+ChannelName_Other public entities in donor country,0.0121362910931086
+ChannelName_Pacific Regional Environment Programme,0.0191372380024443
+ChannelName_Pan-American Health Organisation,-0.20968823837452
+ChannelName_Private sector in provider country,0.0437729517634935
+ChannelName_Private sector in recipient country,0.0196672702048008
+ChannelName_Private sector in third country,9.31368741619196e-05
+ChannelName_Private Sector Institutions,0.0261119296718469
+ChannelName_Public corporations,-0.00379908327380944
+ChannelName_Public-Private Partnerships (PPP),-0.0810103448173391
+ChannelName_Recipient Government,0.0131051241802705
+ChannelName_Sahara and Sahel Observatory,0.00396484788961826
+ChannelName_Secretariat of the Pacific Community,0.00532335797343863
+ChannelName_Third Country Government (Delegated co-operation),-0.0608545501775913
+ChannelName_UN-Multi Partner Trust Fund Office,0.0549231442567516
+"ChannelName_United Nations (UN) agency, fund or commission",-0.00500877390243636
+ChannelName_United Nations Capital Development Fund,0.0302783105754907
+ChannelName_United Nations Children’s Fund,0.0686596711306005
+ChannelName_United Nations Conference on Trade and Development,0.0407085053561877
+"ChannelName_United Nations Department of Political and Peacebuilding Affairs, Trust Fund in Support of Political Affairs",-0.0533448707349232
+ChannelName_United Nations Development Programme,-0.0192620134662108
+ChannelName_United Nations Economic Commission for Europe (extrabudgetary contributions only),-0.0190246495285718
+"ChannelName_United Nations Educational, Scientific and Cultural Organisation",0.0889127362774567
+ChannelName_United Nations Environment Programme,0.044581633420896
+ChannelName_United Nations High Commissioner for Human Rights (extrabudgetary contributions only),0.0207404098734331
+ChannelName_United Nations Industrial Development Organisation,0.0457490808800463
+ChannelName_United Nations Institute for Training and Research,0.022788368241511
+ChannelName_United Nations Mine Action Service,-0.0477677410856992
+ChannelName_United Nations Office for Disaster Risk Reduction,-0.00891977794227004
+ChannelName_United Nations Office of Co-ordination of Humanitarian Affairs,0.0468897135449082
+ChannelName_United Nations Office of the High Commissioner for Refugees,-0.0163762892588268
+ChannelName_United Nations Office of the United Nations High Commissioner for Refugees,0.0333248683783219
+ChannelName_United Nations Population Fund,0.198734012996222
+"ChannelName_University, college or other teaching institution, research institute or think-tank",-0.00720827379073026
+ChannelName_World Food Programme,0.083938275883328
+ChannelName_World Health Organisation - assessed contributions,-0.0925246923728746
+ChannelName_World Health Organisation - core voluntary contributions account,-0.0158399054418291
+ChannelName_World Meteorological Organisation,-0.0643184410757725
+ChannelName_nan,-0.0176663177626251

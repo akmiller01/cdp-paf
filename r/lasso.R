@@ -1,4 +1,4 @@
-list.of.packages <- c("data.table", "openxlsx", "tidyverse", "Hmisc")
+list.of.packages <- c("data.table", "openxlsx", "tidyverse", "Hmisc", "glmnet", "fastDummies")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(list.of.packages, require, character.only=T)
@@ -146,13 +146,69 @@ summary(fit)
 1 - fit$deviance/fit$null.deviance
 
 # NLP plus all
+dat$DonorName[which(dat$DonorName=="")] = NA
+dat$SectorName[which(dat$SectorName=="")] = NA
+dat$PurposeName[which(dat$PurposeName=="")] = NA
+dat$FlowName[which(dat$FlowName=="")] = NA
+dat$ChannelName[which(dat$ChannelName=="")] = NA
+
 dat$DonorName = factor(dat$DonorName)
 dat$SectorName = factor(dat$SectorName)
 dat$PurposeName = factor(dat$PurposeName)
 dat$FlowName = factor(dat$FlowName)
 dat$ChannelName = factor(dat$ChannelName)
 fit = glm(
-  `Crisis finance actual`~`Crisis finance confidence`+DonorName+SectorName+PurposeName+FlowName+ChannelName
+  `PAF actual`~`PAF confidence`+DonorName+SectorName+PurposeName+FlowName+ChannelName
   , data=dat)
 summary(fit)
 1 - fit$deviance/fit$null.deviance
+
+dummies = dummy_cols(
+  dat,
+  select_columns = c(
+    "DonorName"
+    ,"SectorName"
+    ,"PurposeName"
+    ,"FlowName"
+    ,"ChannelName"
+  )
+)
+dummy_names = setdiff(names(dummies), names(dat))
+dummies = subset(dummies, select=c(
+  # 'AA confidence',
+  dummy_names
+  ))
+
+y = dat$`AA actual` * 1
+x = data.matrix(
+  dummies
+)
+x[is.na(x)] = 0
+
+#perform k-fold cross-validation to find optimal lambda value
+cv_model <- cv.glmnet(x, y, alpha = 1)
+
+#find optimal lambda value that minimizes test MSE
+best_lambda <- cv_model$lambda.min
+best_lambda
+
+#produce plot of test MSE by lambda value
+plot(cv_model) 
+
+#find coefficients of best model
+best_model <- glmnet(x, y, alpha = 1, lambda = best_lambda)
+best_model_coef = coef(best_model)
+best_model_coef_df = data.frame(variable=dimnames(best_model_coef)[[1]], beta=0)
+x_i = 1
+for(i in attributes(best_model_coef)$i){
+  best_model_coef_df$beta[i+1] = attributes(best_model_coef)$x[x_i]
+  x_i = x_i + 1
+}
+best_model_coef_df = subset(best_model_coef_df, 
+                            variable!="(Intercept)" &
+                              variable!="AA confidence" &
+                              beta!=0
+                            )
+best_model_coef_df$variable = gsub("_NA", "_nan", best_model_coef_df$variable, fixed=T)
+View(best_model_coef_df)
+fwrite(best_model_coef_df, "data/aa_coefficients.csv")

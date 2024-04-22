@@ -1,0 +1,55 @@
+variable,beta
+DonorName_Asian Infrastructure Investment Bank,-0.0431560098417158
+DonorName_Citi Foundation,-0.216611467128357
+DonorName_European Bank for Reconstruction and Development,-0.407078334816192
+DonorName_Global Environment Facility,-0.00194082454478744
+DonorName_Global Green Growth Institute,-0.161660996934539
+DonorName_IDB Invest,-0.722996617031594
+DonorName_International Finance Corporation,-0.20029308359427
+DonorName_Italy,-0.00980540940034239
+DonorName_Portugal,-0.420662170275264
+DonorName_UNDP,-0.00876736624588458
+DonorName_WFP,-0.00762975198395193
+SectorName_I.1.d. Post-Secondary Education,-0.385305543548738
+SectorName_II.3.a. Energy Policy,-0.160202951291355
+SectorName_II.3.f. Energy distribution,-0.604735147458091
+SectorName_IV.1. General Environment Protection,-0.0317116241294194
+SectorName_IX. Unallocated / Unspecified,-0.154300356351586
+PurposeName_Agricultural extension,-0.608371341182039
+PurposeName_Agricultural research,-0.608371341227261
+PurposeName_Anti-corruption organisations and institutions,-0.60837134127244
+PurposeName_Biodiversity,-0.761443929327761
+PurposeName_Decentralisation and support to subnational government,-0.0978997547633251
+PurposeName_Democratic participation and civil society,-0.0483525593864447
+PurposeName_Electric power transmission and distribution (centralised grids),-0.00363619597235424
+PurposeName_Employment creation,-0.0610924352804186
+"PurposeName_Energy generation, renewable sources - multiple technologies",-0.810001918743205
+PurposeName_Energy research,-0.448168392887432
+PurposeName_Environmental research,-0.0439329717043401
+PurposeName_Food crop production,-0.608371393067665
+PurposeName_Higher education,-0.379261063667824
+PurposeName_Housing policy and administrative management,-0.608371528769309
+PurposeName_Industrial crops/export crops,-0.201293193528306
+PurposeName_Industrial policy and administrative management,-0.608371528359281
+PurposeName_Low-cost housing,-0.216611196460039
+PurposeName_Medical research,-0.764566606895316
+PurposeName_Multisector education/training,-0.0126672869766059
+PurposeName_Plant and post-harvest protection and pest control,-0.716611196609196
+PurposeName_Reproductive health care,-0.216611196639162
+PurposeName_Rescheduling and refinancing,-0.608371528583126
+PurposeName_Sectors not specified,-0.0034853842958466
+PurposeName_Security system management and reform,-0.293155739527226
+PurposeName_Site preservation,-0.576659905136015
+ChannelName_Black Sea Trade and Development Bank,-0.216611197366287
+ChannelName_Development Bank of Latin America,-0.0118909520579113
+ChannelName_European Investment Bank,-0.122580066843504
+ChannelName_International Finance Corporation,-0.0978999354224036
+ChannelName_International Monetary Fund - Poverty Reduction and Growth Trust,-0.608371523641462
+ChannelName_Multilateral Organisations,-0.12817567960532
+ChannelName_Private sector in recipient country,0.0127695971910492
+ChannelName_UN-Multi Partner Trust Fund Office,-0.716611198956198
+"ChannelName_United Nations (UN) agency, fund or commission",-0.0109756894094946
+ChannelName_United Nations Conference on Trade and Development,-0.216611199643432
+ChannelName_United Nations High Commissioner for Human Rights (extrabudgetary contributions only),-0.608371531583501
+ChannelName_World Meteorological Organisation,-0.0396446849006021
+ChannelName_nan,-0.0133266213814984
