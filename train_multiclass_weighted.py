@@ -4,7 +4,7 @@
 
 # login()
 
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 from transformers import (
     AutoTokenizer,
     DataCollatorWithPadding,
@@ -93,10 +93,22 @@ class WeightedBertForSequenceClassification(BertForSequenceClassification):
             attentions=outputs.attentions,
         )
 
-dataset = load_dataset("alex-miller/cdp-paf-meta", split="train")
+dataset = load_dataset("alex-miller/cdp-paf-meta-limited", split="train")
+# Retain only "Unrelated" and "Crisis financing" as other positive cases we will draw from synthetic dataset
+dataset = dataset.filter(lambda example: example['labels'] in ['Unrelated', 'Crisis financing'])
+synth = load_dataset("alex-miller/cdp-paf-meta-limited-synthetic")
+# Add removable column to stratify
+dataset = dataset.add_column("class_labels", dataset['labels'])
+dataset = dataset.class_encode_column('class_labels').train_test_split(
+    test_size=0.1,
+    stratify_by_column="class_labels",
+    shuffle=True,
+    seed=42
+)
+dataset['train'] = concatenate_datasets([dataset['train'], synth['train']])
+dataset['test'] = concatenate_datasets([dataset['test'], synth['test']])
 
 unique_labels = [
-    "Unrelated",
     "Crisis financing",
     "PAF",
     "AA",
@@ -110,25 +122,20 @@ id2label = {i: label for i, label in enumerate(unique_labels)}
 label2id = {id2label[i]: i for i in id2label.keys()}
 
 weight_list = list()
-total_rows = dataset.num_rows
+total_rows = dataset['train'].num_rows + dataset['test'].num_rows
 print("Weights:")
 for label in unique_labels:
-    label_rows = dataset.filter(lambda example: label in example['labels']).num_rows
+    filtered_dataset = dataset.filter(lambda example: label in example['labels'])
+    label_rows = filtered_dataset['train'].num_rows + filtered_dataset['test'].num_rows
     label_weight = total_rows / label_rows
     weight_list.append(label_weight)
     print("{}: {}".format(label, label_weight))
+
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 weights = torch.tensor(weight_list)
 weights = weights.to(device)
 
-dataset = dataset.add_column("class_labels", dataset['labels'])
-
-dataset = dataset.class_encode_column('class_labels').train_test_split(
-    test_size=0.2,
-    stratify_by_column="class_labels",
-    shuffle=True,
-    seed=42
-)
+dataset = dataset.remove_columns('class_labels')
 
 card = "alex-miller/ODABert"
 tokenizer = AutoTokenizer.from_pretrained(card, model_max_length=512)
@@ -138,8 +145,11 @@ def preprocess_function(example):
     all_labels = example['labels'].split(",")
     labels = [0. for i in range(len(unique_labels))]
     for label in all_labels:
-        label_id = label2id[label]
-        labels[label_id] = 1.
+        try:
+            label_id = label2id[label]
+            labels[label_id] = 1.
+        except KeyError:
+            pass
 
     example = tokenizer(example['text'], truncation=True)
     example['labels'] = labels
@@ -173,9 +183,9 @@ model.label_smoothing = 0.0
 training_args = TrainingArguments(
     'cdp-multi-classifier-weighted',
     learning_rate=1e-6, # This can be tweaked depending on how loss progresses
-    per_device_train_batch_size=16, # These should be tweaked to match GPU VRAM
-    per_device_eval_batch_size=16,
-    num_train_epochs=3,
+    per_device_train_batch_size=24, # These should be tweaked to match GPU VRAM
+    per_device_eval_batch_size=24,
+    num_train_epochs=10,
     weight_decay=0.01,
     evaluation_strategy='epoch',
     save_strategy='epoch',
