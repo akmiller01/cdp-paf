@@ -117,7 +117,9 @@ for label in unique_labels:
     label_weight = total_rows / label_rows
     weight_list.append(label_weight)
     print("{}: {}".format(label, label_weight))
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
 weights = torch.tensor(weight_list)
+weights = weights.to(device)
 
 dataset = dataset.add_column("class_labels", dataset['labels'])
 
