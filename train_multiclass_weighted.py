@@ -169,7 +169,7 @@ model.class_weights = weights
 model.label_smoothing = 0.0
 
 training_args = TrainingArguments(
-    'cdp-multi-classifier',
+    'cdp-multi-classifier-weighted',
     learning_rate=1e-6, # This can be tweaked depending on how loss progresses
     per_device_train_batch_size=16, # These should be tweaked to match GPU VRAM
     per_device_eval_batch_size=16,
