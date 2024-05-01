@@ -18,6 +18,7 @@ from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, MSELoss
 from transformers.modeling_outputs import SequenceClassifierOutput
 import evaluate
 import numpy as np
+import math
 
 from typing import Optional, Tuple, Union
 
@@ -95,7 +96,12 @@ def weighted_forward_bert(
 
 dataset = load_dataset("alex-miller/cdp-paf-meta-limited", split="train")
 # Retain only "Unrelated" and "Crisis financing" as other positive cases we will draw from synthetic dataset
-dataset = dataset.filter(lambda example: example['labels'] in ['Unrelated', 'Crisis financing'])
+cf_dataset = dataset.filter(lambda example: example['labels'] == 'Crisis financing')
+unrelated_dataset = dataset.filter(lambda example: example['labels'] == 'Unrelated')
+# Cut unrelated by half to save on processing
+half_unrelated_num_rows = math.floor(unrelated_dataset.num_rows / 2)
+unrelated_dataset = unrelated_dataset.shuffle(seed=42).select(range(half_unrelated_num_rows))
+dataset = concatenate_datasets([cf_dataset, unrelated_dataset])
 synth = load_dataset("alex-miller/cdp-paf-meta-limited-synthetic")
 # Add removable column to stratify
 dataset = dataset.add_column("class_labels", dataset['labels'])
@@ -182,7 +188,7 @@ training_args = TrainingArguments(
     learning_rate=1e-6, # This can be tweaked depending on how loss progresses
     per_device_train_batch_size=24, # These should be tweaked to match GPU VRAM
     per_device_eval_batch_size=24,
-    num_train_epochs=10,
+    num_train_epochs=15,
     weight_decay=0.01,
     evaluation_strategy='epoch',
     save_strategy='epoch',
