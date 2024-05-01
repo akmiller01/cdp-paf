@@ -111,12 +111,7 @@ dataset['test'] = concatenate_datasets([dataset['test'], synth['test']])
 unique_labels = [
     "Crisis financing",
     "PAF",
-    "AA",
-    "Direct",
-    "Indirect",
-    "Part",
-    "WB CAT DDO",
-    "Contingent financing"
+    "AA"
 ]
 id2label = {i: label for i, label in enumerate(unique_labels)}
 label2id = {id2label[i]: i for i in id2label.keys()}
