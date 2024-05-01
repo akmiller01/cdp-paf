@@ -25,6 +25,7 @@ dat$iati_text[which(!dat$long)] = ""
 sum(dat$iati_text=="")
 dat$long = NULL
 dat = dat[which(!duplicated(dat)),]
+dat = dat[which(dat$Year %in% c(2017:2021))]
 
 ### Join metadata from CDP files ####
 common_names = names(crisis)
