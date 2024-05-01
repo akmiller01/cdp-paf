@@ -80,7 +80,7 @@ class WeightedBertForSequenceClassification(BertForSequenceClassification):
                 loss_fct = CrossEntropyLoss(weight=self.class_weights, label_smoothing=self.label_smoothing)
                 loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
             elif self.config.problem_type == "multi_label_classification":
-                loss_fct = BCEWithLogitsLoss(weight=self.class_weights)
+                loss_fct = BCEWithLogitsLoss(pos_weight=self.class_weights)
                 loss = loss_fct(logits, labels)
         if not return_dict:
             output = (logits,) + outputs[2:]
@@ -125,9 +125,11 @@ weight_list = list()
 total_rows = dataset['train'].num_rows + dataset['test'].num_rows
 print("Weights:")
 for label in unique_labels:
-    filtered_dataset = dataset.filter(lambda example: label in example['labels'])
-    label_rows = filtered_dataset['train'].num_rows + filtered_dataset['test'].num_rows
-    label_weight = total_rows / label_rows
+    positive_filtered_dataset = dataset.filter(lambda example: label in example['labels'])
+    negative_filtered_dataset = dataset.filter(lambda example: label not in example['labels'])
+    pos_label_rows = positive_filtered_dataset['train'].num_rows + positive_filtered_dataset['test'].num_rows
+    neg_label_rows = negative_filtered_dataset['train'].num_rows + negative_filtered_dataset['test'].num_rows
+    label_weight = neg_label_rows / pos_label_rows
     weight_list.append(label_weight)
     print("{}: {}".format(label, label_weight))
 
