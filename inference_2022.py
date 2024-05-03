@@ -1,7 +1,8 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import torch
 import numpy as np
-from datasets import load_dataset
+import pandas as pd
+from datasets import Dataset
 import math
 
 
@@ -41,13 +42,14 @@ def inference(model, inputs):
     return predicted_classes, predicted_confidences
 
 def map_columns(example):
-    text = " ".join(
-        [
-            example['project_title'],
-            example['short_description'],
-            example['long_description']
-        ]
-    )
+    textual_data_list = [
+        example['project_title'],
+        example['short_description'],
+        example['long_description']
+    ]
+    textual_data_list = [str(textual_data) for textual_data in textual_data_list if textual_data is not None]
+    text = " ".join(textual_data_list)
+
     predictions = {
         'Crisis finance': [False, 0],
         'PAF': [False, 0],
@@ -74,9 +76,12 @@ def map_columns(example):
     return example
 
 def main():
-    dataset = load_dataset("csv", data_files="large_data/crs_2022.csv", split="train")
-    dataset = dataset.map(map_columns)
-    dataset.to_csv('predicted_crs_2022.csv')
+    text_cols = ['project_title', 'short_description', 'long_description']
+    dataset = pd.read_csv("large_data/crs_2022.csv")
+    dataset_text = dataset[text_cols]
+    dataset_text = Dataset.from_pandas(dataset_text)
+    dataset_text = dataset_text.map(map_columns, remove_columns=text_cols)
+    dataset.to_csv('large_data/crs_2022_predictions.csv')
 
 
 if __name__ == '__main__':
