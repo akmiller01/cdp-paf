@@ -6,6 +6,7 @@ from sklearn.metrics import multilabel_confusion_matrix
 import pandas as pd
 from scipy.special import softmax
 import math
+import evaluate
 
 
 CF_POSITIVE_CONFIDENCE_THRESHOLD = 0
@@ -20,13 +21,17 @@ global MODEL_2
 global MODEL_3
 TOKENIZER = AutoTokenizer.from_pretrained('alex-miller/ODABert', model_max_length=512)
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
-MODEL_1 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-crisis-finance-classifier")
+MODEL_1 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-crisis-finance-classifier-limited")
 MODEL_1 = MODEL_1.to(DEVICE)
 MODEL_2 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-paf-classifier-limited")
 MODEL_2 = MODEL_2.to(DEVICE)
 MODEL_3 = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-aa-classifier-synth-limited")
 MODEL_3 = MODEL_3.to(DEVICE)
 
+
+clf_metrics = evaluate.combine(["accuracy", "f1", "precision", "recall"])
+def compute_metrics(predictions, labels):
+    return clf_metrics.compute(predictions=predictions, references=labels)
 
 def chunk_by_tokens(input_text, model_max_size=512):
     chunks = list()
@@ -39,11 +44,6 @@ def chunk_by_tokens(input_text, model_max_size=512):
     for i in range(0, token_length, calculated_chunk_size):
         chunks.append(TOKENIZER.decode(tokens[i:i + calculated_chunk_size]))
     return chunks
-
-
-def calculate_correct(example):
-    correct = (example['Crisis finance actual'] == example['Crisis finance predicted']) and (example['PAF actual'] == example['PAF predicted']) and (example['AA actual'] == example['AA predicted'])
-    return correct
 
 
 def inference(model, inputs, positive_class):
@@ -88,16 +88,13 @@ def map_columns(example):
     example['PAF confidence'] = predictions['PAF'][1]
     example['AA predicted'] = predictions['AA'][0]
     example['AA confidence'] = predictions['AA'][1]
-    example['Correct'] = calculate_correct(example)
     return example
 
 def main():
-    dataset = load_dataset('alex-miller/cdp-paf-meta', split='train')
+    dataset = load_dataset('alex-miller/cdp-paf-meta-limited', split='train')
+    dataset = dataset.shuffle(seed=1337).select(range(10000))
     dataset = dataset.map(map_columns)
-    print(
-        'Overall accuracy: {}%'.format(round(np.mean(dataset['Correct']) * 100, ndigits=2))
-    )
-    dataset.to_csv('predicted_meta_model_data_limited.csv')
+    # dataset.to_csv('predicted_meta_model_data_limited.csv')
     y_true = np.array([
         dataset['Crisis finance actual'],
         dataset['PAF actual'],
@@ -112,14 +109,17 @@ def main():
     confusion_indices = ["Actual negative", "Actual positive"]
     confusion_columns = ["Predicted negative", "Predicted positive"]
     crisis_confusion = pd.DataFrame(mcm[0], index=confusion_indices, columns=confusion_columns)
-    crisis_confusion.to_csv('crisis_confusion_limited.csv')
     paf_confusion = pd.DataFrame(mcm[1], index=confusion_indices, columns=confusion_columns)
-    paf_confusion.to_csv('paf_confusion_limited.csv')
     aa_confusion = pd.DataFrame(mcm[2], index=confusion_indices, columns=confusion_columns)
-    aa_confusion.to_csv('aa_confusion_limited.csv')
+    print("Crisis finance:")
     print(crisis_confusion)
+    print(compute_metrics(dataset['Crisis finance actual'], dataset['Crisis finance predicted']))
+    print("PAF:")
     print(paf_confusion)
+    print(compute_metrics(dataset['PAF actual'], dataset['PAF predicted']))
+    print("AA:")
     print(aa_confusion)
+    print(compute_metrics(dataset['AA actual'], dataset['AA predicted']))
 
 
 if __name__ == '__main__':

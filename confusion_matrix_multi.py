@@ -79,9 +79,9 @@ def map_columns(example):
 
 def main():
     dataset = load_dataset('alex-miller/cdp-paf-meta-limited', split='train')
-    dataset = dataset.shuffle(seed=1337).select(range(1000))
+    dataset = dataset.shuffle(seed=1337).select(range(10000))
     dataset = dataset.map(map_columns)
-    dataset.to_csv('large_data/predicted_meta_model_data_multi.csv')
+    # dataset.to_csv('predicted_meta_model_data_multi.csv')
     y_true = np.array([
         dataset['Crisis finance actual'],
         dataset['PAF actual'],
