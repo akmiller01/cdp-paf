@@ -81,7 +81,9 @@ def main():
     dataset_text = dataset[text_cols]
     dataset_text = Dataset.from_pandas(dataset_text)
     dataset_text = dataset_text.map(map_columns, remove_columns=text_cols)
-    dataset.to_csv('large_data/crs_2022_predictions.csv')
+    dataset_text = pd.DataFrame(dataset_text)
+    dataset = pd.concat([dataset.reset_index(drop=True), dataset_text.reset_index(drop=True)], axis=1)
+    dataset.to_csv('large_data/crs_2022_predictions.csv', index=False)
 
 
 if __name__ == '__main__':
