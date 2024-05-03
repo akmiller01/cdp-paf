@@ -110,6 +110,12 @@ textual_cols_for_classification %in% names(crs)
 crs = crs %>%
   unite(text, all_of(textual_cols_for_classification), sep=" ", na.rm=T)
 
+mean(!is.na(crs$crisis_label=="Crisis financing"))
+cf = subset(crs, crisis_label=="Crisis financing")
+mean(!is.na(cf$paf_label))
+paf = subset(cf, paf_label=="PAF")
+mean(!is.na(paf$aa_label))
+
 ### Make labels ####
 label_cols = c(
   "crisis_label",
