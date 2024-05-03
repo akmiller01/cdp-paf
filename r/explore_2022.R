@@ -23,27 +23,42 @@ crs$`AA predicted`[blank_indices] = F
 # crs$`Crisis finance predicted`[which(crs$`Crisis finance confidence`<0.75)] = F
 
 # Set PAF confidence equal to AA confidence if AA predicted and PAF not
-crs$`PAF confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)] = 
-  crs$`AA confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)]
-crs$`PAF predicted`[which(crs$`AA predicted`)] = T
+# crs$`PAF confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)] = 
+#   crs$`AA confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)]
+# crs$`PAF predicted`[which(crs$`AA predicted`)] = T
 
 # Set CF confidence equal to PAF confidence if PAF predicted and CF not
-crs$`Crisis finance confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)] = 
-  crs$`PAF confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)]
-crs$`Crisis finance predicted`[which(crs$`PAF predicted`)] = T
+# crs$`Crisis finance confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)] = 
+#   crs$`PAF confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)]
+# crs$`Crisis finance predicted`[which(crs$`PAF predicted`)] = T
+
+# Allow a majority vote by PAF and AA to overrule CF
+crs$`Crisis finance confidence`[which(crs$`PAF predicted` & crs$`AA predicted`)] =
+  crs$`PAF confidence`[which(crs$`PAF predicted` & crs$`AA predicted`)]
+crs$`Crisis finance predicted`[which(crs$`PAF predicted` & crs$`AA predicted`)] = T
+
+# Set PAF confidence equal to CF confidence if PAF predicted and CF not
+crs$`PAF confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)] =
+  crs$`Crisis finance confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)]
+crs$`PAF predicted`[which(!crs$`Crisis finance predicted`)] = F
+
+# Set AA confidence equal to PAF confidence if AA predicted and PAF not
+crs$`AA confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)] =
+  crs$`PAF confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)]
+crs$`AA predicted`[which(!crs$`PAF predicted`)] = F
 
 # From source data, 23.6% of CRS is Crisis financing
 # 1.2% of crisis financing is PAF
 # 22.5% of PAF is AA
-mean(crs$`Crisis finance predicted`) # 30.9%
+mean(crs$`Crisis finance predicted`) # 30.4%
 cf = subset(crs, `Crisis finance predicted`)
 cf = cf[order(-cf$`Crisis finance confidence`)]
 notcf = subset(crs, !`Crisis finance predicted`)
-mean(cf$`PAF predicted`) # 2.3%
+mean(cf$`PAF predicted`) # 0.7%
 paf = subset(cf, `PAF predicted`)
 paf = paf[order(-paf$`PAF confidence`)]
 notpaf = subset(cf, !`PAF predicted`)
-mean(paf$`AA predicted`) # 8.4%
+mean(paf$`AA predicted`) # 26.9%
 aa = subset(paf, `AA predicted`)
 aa = aa[order(-aa$`AA confidence`)]
 notaa = subset(paf, !`AA predicted`)
@@ -81,7 +96,8 @@ skinny_cols = c(
   "AA predicted",
   "AA confidence"
 )
-fwrite(cf[,skinny_cols,with=F], "large_data/crisis_finance_2022_predictions_ordered_skinny.csv")
-fwrite(paf[,skinny_cols,with=F], "large_data/paf_2022_predictions_ordered_skinny.csv")
-fwrite(aa[,skinny_cols,with=F], "large_data/aa_2022_predictions_ordered_skinny.csv")
+fwrite(crs[order(-crs$`Crisis finance confidence`),skinny_cols,with=F], "large_data/crs_2022_predictions_skinny.csv")
+fwrite(crs[order(-crs$`Crisis finance confidence`),skinny_cols,with=F], "large_data/crisis_finance_2022_predictions_ordered_skinny.csv")
+fwrite(crs[order(-crs$`PAF confidence`),skinny_cols,with=F], "large_data/paf_2022_predictions_ordered_skinny.csv")
+fwrite(crs[order(-crs$`AA confidence`),skinny_cols,with=F], "large_data/aa_2022_predictions_ordered_skinny.csv")
 
