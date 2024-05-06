@@ -1,4 +1,4 @@
-list.of.packages <- c("data.table", "ggplot2", "Hmisc")
+list.of.packages <- c("data.table", "ggplot2", "Hmisc", "tidyverse")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(list.of.packages, require, character.only=T)
@@ -201,3 +201,44 @@ crs = crs[order(
 ),keep, with=F]
 fwrite(crs,
        "large_data/crs_2022_predictions_ordered.csv")
+
+textual_cols_for_classification = c(
+  "project_title",
+  "short_description",
+  "long_description"
+)
+
+crs = crs %>%
+  unite(text, all_of(textual_cols_for_classification), sep=" ", na.rm=T, remove=F)
+
+cf_keywords = c(
+  'preparedness', 'disaster', 'crisis', 'refugee', 'hazard', 'humanitaire', 'displaced', 'emergencies', 'recovery', 'urgence', 'migrants', 'hygiene', 'immediate', 'drought', 'crises', 'flood', 'crise', 'mine', 'réfugiés', 'internally', 'idps', 'shelter', 'saving', 'malnutrition', 'explosive', 'vulnérables', 'war', 'réponse', 'besoins', 'armed', 'disasters', 'rapid', 'camp', 'victims', 'risks', 'humanitaires', 'removal', 'displacement', 'mines', 'camps', 'acute', 'situations', 'earthquake', 'cyclone', 'rapidly', 'déplacées', 'communautés', 'warning', 'conflict', 'appeal'
+)
+cf_regex = paste0(
+  "\\b",
+  paste(cf_keywords, collapse="\\b|\\b"),
+  "\\b"
+)
+paf_keywords = c(
+  'insurance', 'ddo', 'cat', 'catastrophe', 'dref', 'deferred', 'contingent', 'drawdown', 'option', 'index','financed', 'quickly', 'weather', 'naturels', 'assurance','insuresilience', 'climatiques', 'instruments','landslide', 'innovations', 'pooling', 'parametric'
+)
+paf_regex = paste0(
+  "\\b",
+  paste(paf_keywords, collapse="\\b|\\b"),
+  "\\b"
+)
+aa_keywords = c(
+  'anticipatory', 'forecasts', 'désastre', 'forpac', 'probabilistic', 'prévisions', 'forecased', 'anticipation', 'rapidement', 'flexible', 'shock', 'predict'
+)
+aa_regex = paste0(
+  "\\b",
+  paste(aa_keywords, collapse="\\b|\\b"),
+  "\\b"
+)
+
+crs$cf_keyword_search = grepl(cf_regex, crs$text, perl=T, ignore.case = T)
+crs$paf_keyword_search = grepl(paf_regex, crs$text, perl=T, ignore.case = T)
+crs$aa_keyword_search = grepl(aa_regex, crs$text, perl=T, ignore.case = T)
+crs$text = NULL
+fwrite(crs,
+       "large_data/crs_2022_predictions_ordered_keyword_search.csv")
