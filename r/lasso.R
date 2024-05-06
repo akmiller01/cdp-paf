@@ -25,6 +25,7 @@ dat$iati_text[which(!dat$long)] = ""
 sum(dat$iati_text=="")
 dat$long = NULL
 dat = dat[which(!duplicated(dat)),]
+dat = dat[which(dat$Year %in% c(2017:2021))]
 
 ### Join metadata from CDP files ####
 common_names = names(crisis)
@@ -99,24 +100,13 @@ limited_textual_cols_for_classification = c(
   "LongDescription",
   "iati_text"
 )
-textual_cols_for_classification = c(
-  "DonorName",
-  "ProjectTitle",
-  "SectorName",
-  "PurposeName",
-  "FlowName",
-  "ShortDescription",
-  "LongDescription",
-  "iati_text"
-)
-textual_cols_for_classification %in% names(crs)
 
 crs = crs %>%
-  unite(limited_text, all_of(limited_textual_cols_for_classification), sep=" ", na.rm=T, remove=F) %>%
-  unite(full_text, all_of(textual_cols_for_classification), sep=" ", na.rm=T, remove=F)
+  unite(text, all_of(limited_textual_cols_for_classification), sep=" ", na.rm=T)
+crs$text = trimws(crs$text)
+crs$text = gsub('\"\"', '\"\"\"\"', crs$text)
 keep_for_xgboost = c(
-  "full_text",
-  "limited_text",
+  "text",
   "DonorName",
   "SectorName",
   "PurposeName",
@@ -134,14 +124,16 @@ for(env_var in clean_up_env){
 }
 rm(clean_up_env,  env_var)
 
-predicted = fread("large_data/predicted_meta_model_data_combo.csv")
+predicted = fread("large_data/predicted_meta_model_data_multi.csv")
+predicted$text = trimws(predicted$text)
 dat = merge(predicted, crs)
+# miss = subset(dat, is.na(`DonorName`))
 rm(crs, predicted)
 gc()
 
 # Just NLP
 dat = subset(dat, `AA confidence` > 0)
-fit = glm(`AA actual`~`AA confidence`, data=dat)
+fit = glm(`Crisis finance actual`~`Crisis finance confidence`, data=dat)
 summary(fit)
 1 - fit$deviance/fit$null.deviance
 
@@ -158,7 +150,7 @@ dat$PurposeName = factor(dat$PurposeName)
 dat$FlowName = factor(dat$FlowName)
 dat$ChannelName = factor(dat$ChannelName)
 fit = glm(
-  `PAF actual`~`PAF confidence`+DonorName+SectorName+PurposeName+FlowName+ChannelName
+  `Crisis finance actual`~`Crisis finance confidence`+DonorName+SectorName+PurposeName+FlowName+ChannelName
   , data=dat)
 summary(fit)
 1 - fit$deviance/fit$null.deviance

@@ -1,7 +1,7 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import torch
 import numpy as np
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 from sklearn.metrics import multilabel_confusion_matrix
 import pandas as pd
 from scipy.special import softmax
@@ -90,9 +90,31 @@ def map_columns(example):
     example['AA confidence'] = predictions['AA'][1]
     return example
 
+
+def construct_dataset():
+    dataset = load_dataset("alex-miller/cdp-paf-meta-limited", split="train")
+    # Retain only "Unrelated" and "Crisis financing" as other positive cases we will draw from synthetic dataset
+    cf_dataset = dataset.filter(lambda example: example['labels'] == 'Crisis financing')
+    unrelated_dataset = dataset.filter(lambda example: example['labels'] == 'Unrelated')
+    # Cut unrelated by half to save on processing
+    half_unrelated_num_rows = math.floor(unrelated_dataset.num_rows / 2)
+    unrelated_dataset = unrelated_dataset.shuffle(seed=42).select(range(half_unrelated_num_rows))
+    dataset = concatenate_datasets([cf_dataset, unrelated_dataset])
+    synth = load_dataset("alex-miller/cdp-paf-meta-limited-synthetic")
+    # Add removable column to stratify
+    dataset = dataset.add_column("class_labels", dataset['labels'])
+    dataset = dataset.class_encode_column('class_labels').train_test_split(
+        test_size=0.1,
+        stratify_by_column="class_labels",
+        shuffle=True,
+        seed=42
+    )
+    dataset = concatenate_datasets([dataset['test'], synth['test']])
+    return dataset
+
+
 def main():
-    dataset = load_dataset('alex-miller/cdp-paf-meta-limited', split='train')
-    dataset = dataset.shuffle(seed=1337).select(range(10000))
+    dataset = construct_dataset()
     dataset = dataset.map(map_columns)
     # dataset.to_csv('predicted_meta_model_data_limited.csv')
     y_true = np.array([
