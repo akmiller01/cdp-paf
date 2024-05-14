@@ -37,14 +37,14 @@ crs$`Part predicted`[blank_indices] = F
 
 
 # Set PAF confidence equal to AA confidence if AA predicted and PAF not
-crs$`PAF confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)] =
-  crs$`AA confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)]
-crs$`PAF predicted`[which(crs$`AA predicted`)] = T
+# crs$`PAF confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)] =
+#   crs$`AA confidence`[which(crs$`AA predicted` & !crs$`PAF predicted`)]
+# crs$`PAF predicted`[which(crs$`AA predicted`)] = T
 
 # Set CF confidence equal to PAF confidence if PAF predicted and CF not
-crs$`Crisis finance confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)] =
-  crs$`PAF confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)]
-crs$`Crisis finance predicted`[which(crs$`PAF predicted`)] = T
+# crs$`Crisis finance confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)] =
+#   crs$`PAF confidence`[which(crs$`PAF predicted` & !crs$`Crisis finance predicted`)]
+# crs$`Crisis finance predicted`[which(crs$`PAF predicted`)] = T
 
 setnames(crs,
          c(
@@ -289,7 +289,45 @@ crs$`Crisis finance keyword match` = grepl(cf_regex, crs$text, perl=T, ignore.ca
 crs$`PAF keyword match` = grepl(paf_regex, crs$text, perl=T, ignore.case = T)
 crs$`AA keyword match` = grepl(aa_regex, crs$text, perl=T, ignore.case = T)
 
-predicted_cols = names(crs)[which(endsWith(names(crs), "predicted"))]
+# Use ML to expand net
+# crs$`Crisis finance determination` = ifelse(
+#   crs$`Crisis finance keyword match` | crs$`Crisis finance predicted ML`,
+#   ifelse(crs$`Crisis finance keyword match` & crs$`Crisis finance predicted ML`, "Yes", "Review"),
+#   "No"
+# )
+# crs$`PAF determination` = ifelse(
+#   crs$`PAF keyword match` | crs$`PAF predicted ML`,
+#   ifelse(crs$`PAF keyword match` & crs$`PAF predicted ML`, "Yes", "Review"),
+#   "No"
+# )
+# crs$`AA determination` = ifelse(
+#   crs$`AA keyword match` | crs$`AA predicted ML`,
+#   ifelse(crs$`AA keyword match` & crs$`AA predicted ML`, "Yes", "Review"),
+#   "No"
+# )
+
+# Use ML to reduce review
+crs$`Crisis finance determination` = ifelse(
+  crs$`Crisis finance keyword match`,
+  ifelse(crs$`Crisis finance keyword match` & crs$`Crisis finance predicted ML`, "Yes", "Review"),
+  "No"
+)
+crs$`PAF determination` = ifelse(
+  crs$`PAF keyword match`,
+  ifelse(crs$`PAF keyword match` & crs$`PAF predicted ML`, "Yes", "Review"),
+  "No"
+)
+crs$`AA determination` = ifelse(
+  crs$`AA keyword match`,
+  ifelse(crs$`AA keyword match` & crs$`AA predicted ML`, "Yes", "Review"),
+  "No"
+)
+
+describe(crs$`Crisis finance determination`)
+describe(crs$`PAF determination`)
+describe(crs$`AA determination`)
+
+predicted_cols = names(crs)[which(endsWith(names(crs), "predicted ML"))]
 for(predicted_col in predicted_cols){
   crs[which(crs[,predicted_col]==F),predicted_col] = ""
 }
@@ -309,12 +347,15 @@ keep= c(original_names,
         "Crisis finance identified",
         "Crisis finance eligible",
         "Contains debt relief",
+        "Crisis finance determination",
         "Crisis finance keyword match",
         "Crisis finance predicted ML",
         "Crisis finance confidence ML",
+        "PAF determination",
         "PAF keyword match",
         "PAF predicted ML",
         "PAF confidence ML",
+        "AA determination",
         "AA keyword match",
         "AA predicted ML",
         "AA confidence ML",
@@ -327,11 +368,7 @@ keep= c(original_names,
 )
 
 crs = crs[order(
-  -crs$`AA predicted ML`,
-  -crs$`PAF predicted ML`,
-  -crs$`Crisis finance predicted ML`,
-  -crs$`AA confidence ML`,
-  -crs$`PAF confidence ML`,
+  crs$`Crisis finance predicted ML`=="",
   -crs$`Crisis finance confidence ML`
 ),keep]
 
