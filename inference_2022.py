@@ -14,6 +14,9 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 MODEL = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-multi-classifier-weighted")
 MODEL = MODEL.to(DEVICE)
 
+SUB_MODEL = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-multi-classifier-sub-classes-weighted")
+SUB_MODEL = SUB_MODEL.to(DEVICE)
+
 
 def sigmoid(x):
    return 1/(1 + np.exp(-x))
@@ -53,7 +56,10 @@ def map_columns(example):
     predictions = {
         'Crisis finance': [False, 0],
         'PAF': [False, 0],
-        'AA': [False, 0]
+        'AA': [False, 0],
+        'Direct': [False, 0],
+        'Indirect': [False, 0],
+        'Part': [False, 0],
     }
 
     text_chunks = chunk_by_tokens(text)
@@ -67,12 +73,28 @@ def map_columns(example):
         predictions['AA'][0] = predictions['AA'][0] or model_pred[2]
         predictions['AA'][1] = max(predictions['AA'][1], model_conf[2])
 
+        # Apply sub-model only to positive PAF/AA
+        if predictions['PAF'][0] or predictions['AA'][0]:
+            sub_model_pred, sub_model_conf = inference(SUB_MODEL, inputs)
+            predictions['Direct'][0] = predictions['Direct'][0] or sub_model_pred[0]
+            predictions['Direct'][1] = max(predictions['Direct'][1], sub_model_conf[0])
+            predictions['Indirect'][0] = predictions['Indirect'][0] or sub_model_pred[1]
+            predictions['Indirect'][1] = max(predictions['Indirect'][1], sub_model_conf[1])
+            predictions['Part'][0] = predictions['Part'][0] or sub_model_pred[2]
+            predictions['Part'][1] = max(predictions['Part'][1], sub_model_conf[2])
+
     example['Crisis finance predicted'] = predictions['Crisis finance'][0]
     example['Crisis finance confidence'] = predictions['Crisis finance'][1]
     example['PAF predicted'] = predictions['PAF'][0]
     example['PAF confidence'] = predictions['PAF'][1]
     example['AA predicted'] = predictions['AA'][0]
     example['AA confidence'] = predictions['AA'][1]
+    example['Direct predicted'] = predictions['Direct'][0]
+    example['Direct confidence'] = predictions['Direct'][1]
+    example['Indirect predicted'] = predictions['Indirect'][0]
+    example['Indirect confidence'] = predictions['Indirect'][1]
+    example['Part predicted'] = predictions['Part'][0]
+    example['Part confidence'] = predictions['Part'][1]
     return example
 
 def main():

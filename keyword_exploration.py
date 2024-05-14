@@ -16,7 +16,6 @@ cf = dataset.filter(lambda example: 'Crisis financing' in example['labels'] and 
 paf = dataset.filter(lambda example: 'PAF' in example['labels'] and not 'AA' in example['labels'])
 aa = dataset.filter(lambda example: 'AA' in example['labels'])
 
-
 vectorizer = TfidfVectorizer()
 vectorizer.fit(dataset['text'])
 
