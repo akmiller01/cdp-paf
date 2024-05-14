@@ -312,6 +312,9 @@ crs$`Crisis finance determination` = ifelse(
   ifelse(crs$`Crisis finance keyword match` & crs$`Crisis finance predicted ML`, "Yes", "Review"),
   "No"
 )
+crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Yes" & crs$`Contains debt relief`)] = "Review"
+crs$`Crisis finance determination`[which(crs$`Crisis finance identified`)] = "Yes"
+
 crs$`PAF determination` = ifelse(
   crs$`PAF keyword match`,
   ifelse(crs$`PAF keyword match` & crs$`PAF predicted ML`, "Yes", "Review"),
@@ -322,6 +325,7 @@ crs$`AA determination` = ifelse(
   ifelse(crs$`AA keyword match` & crs$`AA predicted ML`, "Yes", "Review"),
   "No"
 )
+crs$`AA determination`[which(crs$`AA determination`=="Yes" & !crs$`humanitarian`)] = "Review"
 
 describe(crs$`Crisis finance determination`)
 describe(crs$`PAF determination`)
@@ -368,7 +372,9 @@ keep= c(original_names,
 )
 
 crs = crs[order(
-  crs$`Crisis finance predicted ML`=="",
+  crs$`Crisis finance determination`=="No",
+  crs$`Crisis finance determination`=="Review",
+  crs$`Crisis finance determination`=="Yes",
   -crs$`Crisis finance confidence ML`
 ),keep]
 
