@@ -320,6 +320,8 @@ crs$`PAF determination` = ifelse(
   ifelse(crs$`PAF keyword match` & crs$`PAF predicted ML`, "Yes", "Review"),
   "No"
 )
+crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Review" & crs$`PAF determination` == "Yes")] = "Yes"
+
 crs$`AA determination` = ifelse(
   crs$`AA keyword match`,
   ifelse(crs$`AA keyword match` & crs$`AA predicted ML`, "Yes", "Review"),

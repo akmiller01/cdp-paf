@@ -73,15 +73,14 @@ def map_columns(example):
         predictions['AA'][0] = predictions['AA'][0] or model_pred[2]
         predictions['AA'][1] = max(predictions['AA'][1], model_conf[2])
 
-        # Apply sub-model only to positive PAF/AA
-        if predictions['PAF'][0] or predictions['AA'][0]:
-            sub_model_pred, sub_model_conf = inference(SUB_MODEL, inputs)
-            predictions['Direct'][0] = predictions['Direct'][0] or sub_model_pred[0]
-            predictions['Direct'][1] = max(predictions['Direct'][1], sub_model_conf[0])
-            predictions['Indirect'][0] = predictions['Indirect'][0] or sub_model_pred[1]
-            predictions['Indirect'][1] = max(predictions['Indirect'][1], sub_model_conf[1])
-            predictions['Part'][0] = predictions['Part'][0] or sub_model_pred[2]
-            predictions['Part'][1] = max(predictions['Part'][1], sub_model_conf[2])
+        # Apply sub-model
+        sub_model_pred, sub_model_conf = inference(SUB_MODEL, inputs)
+        predictions['Direct'][0] = predictions['Direct'][0] or sub_model_pred[0]
+        predictions['Direct'][1] = max(predictions['Direct'][1], sub_model_conf[0])
+        predictions['Indirect'][0] = predictions['Indirect'][0] or sub_model_pred[1]
+        predictions['Indirect'][1] = max(predictions['Indirect'][1], sub_model_conf[1])
+        predictions['Part'][0] = predictions['Part'][0] or sub_model_pred[2]
+        predictions['Part'][1] = max(predictions['Part'][1], sub_model_conf[2])
 
     example['Crisis finance predicted'] = predictions['Crisis finance'][0]
     example['Crisis finance confidence'] = predictions['Crisis finance'][1]
