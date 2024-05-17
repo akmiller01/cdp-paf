@@ -18,7 +18,7 @@ collapse_whitespace = function(string){
   str_replace_all(string, "\\s+", " ")
 }
 
-crs = fread("large_data/crs_2021_predictions.csv")
+crs = fread("large_data/crs_2022_predictions.csv")
 original_names = names(crs)[1:95]
 
 #  Remove CERF transactions that have the CERF as a channel rather than as donor. These
@@ -415,4 +415,4 @@ crs = crs[order(
 
 
 fwrite(crs,
-       "large_data/crs_2021_cdp_automated.csv")
+       "large_data/crs_2022_cdp_automated.csv")
