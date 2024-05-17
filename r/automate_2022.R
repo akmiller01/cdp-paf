@@ -229,7 +229,7 @@ crs$`Crisis finance eligible`[
   )
 ] = T
 
-crs = subset(crs, `Crisis finance identified` | `Crisis finance eligible`)
+# crs = subset(crs, `Crisis finance identified` | `Crisis finance eligible`)
 
 textual_cols_for_classification = c(
   "project_title",
@@ -266,7 +266,7 @@ crs$`Contains debt relief` = grepl("\\bdebt relief\\b", crs$text, perl=T, ignore
 keywords = fread("data/keywords.csv")
 keywords$keyword = tolower(trimws(keywords$keyword))
 
-cf_keywords = keywords$keyword
+cf_keywords = subset(keywords, category=="CF")$keyword
 cf_regex = paste0(
   "\\b",
   paste(cf_keywords, collapse="\\b|\\b"),
@@ -320,14 +320,14 @@ crs$`PAF determination` = ifelse(
   ifelse(crs$`PAF keyword match` & crs$`PAF predicted ML`, "Yes", "Review"),
   "No"
 )
-crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Review" & crs$`PAF determination` == "Yes")] = "Yes"
+# crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Review" & crs$`PAF determination` == "Yes")] = "Yes"
 
 crs$`AA determination` = ifelse(
   crs$`AA keyword match`,
   ifelse(crs$`AA keyword match` & crs$`AA predicted ML`, "Yes", "Review"),
   "No"
 )
-crs$`AA determination`[which(crs$`AA determination`=="Yes" & !crs$`humanitarian`)] = "Review"
+# crs$`AA determination`[which(crs$`AA determination`=="Yes" & !crs$`humanitarian`)] = "Review"
 
 describe(crs$`Crisis finance determination`)
 describe(crs$`PAF determination`)
