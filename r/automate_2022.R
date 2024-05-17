@@ -18,7 +18,7 @@ collapse_whitespace = function(string){
   str_replace_all(string, "\\s+", " ")
 }
 
-crs = fread("large_data/crs_2022_predictions.csv")
+crs = fread("large_data/crs_2021_predictions.csv")
 original_names = names(crs)[1:95]
 
 #  Remove CERF transactions that have the CERF as a channel rather than as donor. These
@@ -255,7 +255,8 @@ crs = crs %>%
 crs$text = collapse_whitespace(remove_punct(tolower(trimws(crs$text))))
 
 # Exclude transactions that contain the following keywords from the data:
-bad_keywords = c(
+# Note, only exclude these for matching "relief" falsely
+bad_relief_keywords = c(
   "Comic Relief"
   ,"Sport Relief"
   ,"Medical Relief Society"
@@ -267,19 +268,24 @@ bad_keywords = c(
   ,"The RELIEF Centre"
   ,"Relief International"
 )
-bad_keywords = collapse_whitespace(remove_punct(tolower(trimws(bad_keywords))))
-bad_regex = paste0(
+bad_relief_keywords = collapse_whitespace(remove_punct(tolower(trimws(bad_relief_keywords))))
+bad_relief_regex = paste0(
   "\\b",
-  paste(bad_keywords, collapse="\\b|\\b"),
+  paste(bad_relief_keywords, collapse="\\b|\\b"),
   "\\b"
 )
-crs$`Contains exclude keywords` = grepl(bad_regex, crs$text, perl=T, ignore.case = T)
+crs$`Contains bad relief` = grepl(bad_relief_regex, crs$text, perl=T, ignore.case = T)
 
 # Manually check transactions that contain ‘debt relief’
 crs$`Contains debt relief` = grepl("\\bdebt relief\\b", crs$text, perl=T, ignore.case=T)
 
+crs$`Contains relief` = grepl("\\brelief\\b", crs$text, perl=T, ignore.case=T)
+
+
 keywords = fread("data/keywords.csv")
 keywords$keyword = quotemeta(collapse_whitespace(remove_punct(tolower(trimws(keywords$keyword)))))
+# Exclude relief for now because extra logic for bad relief and debt relief
+keywords = subset(keywords, keyword != "relief")
 
 cf_keywords = subset(keywords, category=="CF")$keyword
 cf_regex = paste0(
@@ -301,25 +307,22 @@ aa_regex = paste0(
 )
 
 crs$`Crisis finance keyword match` = grepl(cf_regex, crs$text, perl=T, ignore.case = T)
+crs$`Crisis finance keyword match`[which(
+  crs$`Crisis finance keyword match` == F & # If there are no other matches
+    crs$`Contains relief` == T & # Except for "relief"
+    crs$`Contains bad relief` == F & # And it's not a match for the bad ones
+    crs$`Contains debt relief` == F # or debt relief
+)] = T # Mark it true
+
+# Capture activities which only match for debt relief and no other keywords
+crs$`Only debt relief` = crs$`Contains debt relief` == T &
+  crs$`Crisis finance keyword match` == F
+# if these are later determined to be CF, retroactively mark "Review"
+# but for now mark them as match
+crs$`Crisis finance keyword match`[which(crs$`Contains debt relief`)] = T
+
 crs$`PAF keyword match` = grepl(paf_regex, crs$text, perl=T, ignore.case = T)
 crs$`AA keyword match` = grepl(aa_regex, crs$text, perl=T, ignore.case = T)
-
-# Use ML to expand net
-# crs$`Crisis finance determination` = ifelse(
-#   crs$`Crisis finance keyword match` | crs$`Crisis finance predicted ML`,
-#   ifelse(crs$`Crisis finance keyword match` & crs$`Crisis finance predicted ML`, "Yes", "Review"),
-#   "No"
-# )
-# crs$`PAF determination` = ifelse(
-#   crs$`PAF keyword match` | crs$`PAF predicted ML`,
-#   ifelse(crs$`PAF keyword match` & crs$`PAF predicted ML`, "Yes", "Review"),
-#   "No"
-# )
-# crs$`AA determination` = ifelse(
-#   crs$`AA keyword match` | crs$`AA predicted ML`,
-#   ifelse(crs$`AA keyword match` & crs$`AA predicted ML`, "Yes", "Review"),
-#   "No"
-# )
 
 # Use ML to reduce review
 crs$`Crisis finance determination` =
@@ -333,6 +336,11 @@ crs$`Crisis finance determination` =
        "No" # No if not id'd or eligible
        )
 crs$`Crisis finance determination`[which(crs$`Crisis finance identified`)] = "Yes"
+# Mark those that passed other criteria but only for matching debt relief as review
+crs$`Crisis finance determination`[which(
+  crs$`Crisis finance determination` == "Yes" &
+    crs$`Only debt relief` == T
+  )] = "Review"
 
 crs$`PAF determination` = ifelse(
   crs$`PAF keyword match`,
@@ -353,8 +361,7 @@ crs$`PAF determination`[which(crs$`PAF determination` != "Yes" & crs$`AA determi
 crs$`Crisis finance determination`[which(crs$`Crisis finance determination` != "Yes" & crs$`PAF determination` == "Yes")] = "Yes"
 crs$`Crisis finance determination`[which(crs$`Crisis finance determination` != "Yes" & crs$`PAF determination` == "Review")] = "Review"
 crs$`Crisis finance determination`[which(crs$humanitarian)] = "Yes"
-crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Yes" & crs$`Contains debt relief`)] = "Review"
-crs$`Crisis finance determination`[which(crs$`Contains exclude keywords`)] = "No"
+crs$humanitarian[which(!crs$humanitarian & crs$`AA determination` == "Yes")] = T
 
 describe(crs$`Crisis finance determination`)
 describe(crs$`PAF determination`)
@@ -379,7 +386,6 @@ keep= c(original_names,
         "humanitarian",
         "Crisis finance identified",
         "Crisis finance eligible",
-        "Contains debt relief",
         "Crisis finance determination",
         "Crisis finance keyword match",
         "Crisis finance predicted ML",
@@ -409,4 +415,4 @@ crs = crs[order(
 
 
 fwrite(crs,
-       "large_data/crs_2022_cdp_automated.csv")
+       "large_data/crs_2021_cdp_automated.csv")
