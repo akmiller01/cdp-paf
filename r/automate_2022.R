@@ -267,12 +267,13 @@ bad_keywords = c(
   ,"The RELIEF Centre"
   ,"Relief International"
 )
+bad_keywords = collapse_whitespace(remove_punct(tolower(trimws(bad_keywords))))
 bad_regex = paste0(
   "\\b",
   paste(bad_keywords, collapse="\\b|\\b"),
   "\\b"
 )
-crs = subset(crs, !grepl(bad_regex, crs$text, perl=T, ignore.case = T))
+crs$`Contains exclude keywords` = grepl(bad_regex, crs$text, perl=T, ignore.case = T)
 
 # Manually check transactions that contain ‘debt relief’
 crs$`Contains debt relief` = grepl("\\bdebt relief\\b", crs$text, perl=T, ignore.case=T)
@@ -331,8 +332,6 @@ crs$`Crisis finance determination` =
          ),
        "No" # No if not id'd or eligible
        )
-
-crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Yes" & crs$`Contains debt relief`)] = "Review"
 crs$`Crisis finance determination`[which(crs$`Crisis finance identified`)] = "Yes"
 
 crs$`PAF determination` = ifelse(
@@ -340,14 +339,22 @@ crs$`PAF determination` = ifelse(
   ifelse(crs$`PAF keyword match` & crs$`PAF predicted ML`, "Yes", "Review"),
   "No"
 )
-# crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Review" & crs$`PAF determination` == "Yes")] = "Yes"
 
 crs$`AA determination` = ifelse(
   crs$`AA keyword match`,
   ifelse(crs$`AA keyword match` & crs$`AA predicted ML`, "Yes", "Review"),
   "No"
 )
-# crs$`AA determination`[which(crs$`AA determination`=="Yes" & !crs$`humanitarian`)] = "Review"
+
+
+# Interrelationships
+crs$`PAF determination`[which(crs$`PAF determination` != "Yes" & crs$`AA determination` == "Yes")] = "Yes"
+crs$`PAF determination`[which(crs$`PAF determination` != "Yes" & crs$`AA determination` == "Review")] = "Review"
+crs$`Crisis finance determination`[which(crs$`Crisis finance determination` != "Yes" & crs$`PAF determination` == "Yes")] = "Yes"
+crs$`Crisis finance determination`[which(crs$`Crisis finance determination` != "Yes" & crs$`PAF determination` == "Review")] = "Review"
+crs$`Crisis finance determination`[which(crs$humanitarian)] = "Yes"
+crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Yes" & crs$`Contains debt relief`)] = "Review"
+crs$`Crisis finance determination`[which(crs$`Contains exclude keywords`)] = "No"
 
 describe(crs$`Crisis finance determination`)
 describe(crs$`PAF determination`)
