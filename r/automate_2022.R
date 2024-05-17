@@ -1,10 +1,22 @@
-list.of.packages <- c("data.table", "ggplot2", "Hmisc", "tidyverse")
+list.of.packages <- c("data.table", "ggplot2", "Hmisc", "tidyverse", "stringr")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(list.of.packages, require, character.only=T)
 
 wd = "~/git/cdp-paf/"
 setwd(wd)
+
+quotemeta <- function(string) {
+  str_replace_all(string, "(\\W)", "\\\\\\1")
+}
+
+remove_punct = function(string){
+  str_replace_all(string, "[[:punct:]]", " ")
+}
+
+collapse_whitespace = function(string){
+  str_replace_all(string, "\\s+", " ")
+}
 
 crs = fread("large_data/crs_2022_predictions.csv")
 original_names = names(crs)[1:95]
@@ -240,6 +252,8 @@ textual_cols_for_classification = c(
 crs = crs %>%
   unite(text, all_of(textual_cols_for_classification), sep=" ", na.rm=T, remove=F)
 
+crs$text = collapse_whitespace(remove_punct(tolower(trimws(crs$text))))
+
 # Exclude transactions that contain the following keywords from the data:
 bad_keywords = c(
   "Comic Relief"
@@ -264,7 +278,7 @@ crs = subset(crs, !grepl(bad_regex, crs$text, perl=T, ignore.case = T))
 crs$`Contains debt relief` = grepl("\\bdebt relief\\b", crs$text, perl=T, ignore.case=T)
 
 keywords = fread("data/keywords.csv")
-keywords$keyword = tolower(trimws(keywords$keyword))
+keywords$keyword = quotemeta(collapse_whitespace(remove_punct(tolower(trimws(keywords$keyword)))))
 
 cf_keywords = subset(keywords, category=="CF")$keyword
 cf_regex = paste0(
