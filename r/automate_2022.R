@@ -307,11 +307,17 @@ crs$`AA keyword match` = grepl(aa_regex, crs$text, perl=T, ignore.case = T)
 # )
 
 # Use ML to reduce review
-crs$`Crisis finance determination` = ifelse(
-  crs$`Crisis finance keyword match`,
-  ifelse(crs$`Crisis finance keyword match` & crs$`Crisis finance predicted ML`, "Yes", "Review"),
-  "No"
-)
+crs$`Crisis finance determination` =
+  ifelse(
+    crs$`Crisis finance identified` | crs$`Crisis finance eligible`, # Must be id'd or eligible
+         ifelse(
+           crs$`Crisis finance keyword match`, # Must be keyword match
+           ifelse(crs$`Crisis finance keyword match` & crs$`Crisis finance predicted ML`, "Yes", "Review"), # Yes if kw match and ML match, else review
+           "No" # No if not keyword match
+         ),
+       "No" # No if not id'd or eligible
+       )
+
 crs$`Crisis finance determination`[which(crs$`Crisis finance determination` == "Yes" & crs$`Contains debt relief`)] = "Review"
 crs$`Crisis finance determination`[which(crs$`Crisis finance identified`)] = "Yes"
 
