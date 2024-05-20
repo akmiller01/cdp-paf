@@ -17,6 +17,8 @@ MODEL = MODEL.to(DEVICE)
 SUB_MODEL = AutoModelForSequenceClassification.from_pretrained("alex-miller/cdp-multi-classifier-sub-classes-weighted")
 SUB_MODEL = SUB_MODEL.to(DEVICE)
 
+YEAR = 2022
+
 
 def sigmoid(x):
    return 1/(1 + np.exp(-x))
@@ -98,13 +100,13 @@ def map_columns(example):
 
 def main():
     text_cols = ['project_title', 'short_description', 'long_description']
-    dataset = pd.read_csv("large_data/crs_2022.csv")
+    dataset = pd.read_csv("large_data/crs_{}.csv".format(YEAR))
     dataset_text = dataset[text_cols]
     dataset_text = Dataset.from_pandas(dataset_text)
     dataset_text = dataset_text.map(map_columns, remove_columns=text_cols)
     dataset_text = pd.DataFrame(dataset_text)
     dataset = pd.concat([dataset.reset_index(drop=True), dataset_text.reset_index(drop=True)], axis=1)
-    dataset.to_csv('large_data/crs_2022_predictions.csv', index=False)
+    dataset.to_csv('output/crs_{}_predictions.csv'.format(YEAR), index=False)
 
 
 if __name__ == '__main__':
