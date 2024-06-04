@@ -1,4 +1,4 @@
-list.of.packages <- c("data.table", "openxlsx", "Hmisc")
+list.of.packages <- c("data.table", "openxlsx", "Hmisc", "stringr")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(list.of.packages, require, character.only=T)
@@ -59,7 +59,7 @@ new_aa_pn = setdiff(aa_auto_pn, aa_pn)
 length(missed_aa_pn) / length(aa_pn) 
 missed_aa = subset(aa, ProjectNumber %in% missed_aa_pn)
 new_aa = subset(aa_auto, project_number %in% new_aa_pn)
-new_aa = new_aa[order(-new_aa$`AA confidence ML`),c("project_title","short_description","long_description","AA determination","AA confidence ML")]
+new_aa = new_aa[order(-new_aa$`AA confidence ML`),c("crs_id","project_title","short_description","long_description","purpose_name","AA determination","AA confidence ML")]
 describe(new_aa$`AA determination`)
 fwrite(missed_aa, paste0("data/missed_",YEAR,"_aa.csv"))
 fwrite(new_aa, paste0("data/new_",YEAR,"_aa.csv"))
@@ -76,7 +76,7 @@ new_paf_pn = subset(new_paf_pn, !is.na(new_paf_pn))
 length(missed_paf_pn) / length(paf_pn) 
 missed_paf = subset(paf, ProjectNumber %in% missed_paf_pn)
 new_paf = subset(paf_auto, project_number %in% new_paf_pn)
-new_paf = new_paf[order(-new_paf$`PAF confidence ML`),c("project_title","short_description","long_description","PAF determination","PAF confidence ML")]
+new_paf = new_paf[order(-new_paf$`PAF confidence ML`),c("crs_id","project_title","short_description","long_description","purpose_name","PAF determination","PAF confidence ML")]
 describe(new_paf$`PAF determination`)
 fwrite(missed_paf, paste0("data/missed_",YEAR,"_paf.csv"))
 fwrite(new_paf, paste0("data/new_",YEAR,"_paf.csv"))
@@ -93,7 +93,7 @@ new_cf_pn = subset(new_cf_pn, !is.na(new_cf_pn))
 length(missed_cf_pn) / length(cf_pn) 
 missed_cf = subset(cf, ProjectNumber %in% missed_cf_pn)
 new_cf = subset(cf_auto, project_number %in% new_cf_pn)
-new_cf = new_cf[order(-new_cf$`Crisis finance confidence ML`),c("project_title","short_description","long_description","Crisis finance determination","Crisis finance confidence ML")]
+new_cf = new_cf[order(-new_cf$`Crisis finance confidence ML`),c("crs_id","project_title","short_description","long_description","purpose_name","Crisis finance determination","Crisis finance confidence ML")]
 describe(new_cf$`Crisis finance determination`)
 fwrite(missed_cf, paste0("data/missed_",YEAR,"_cf.csv"))
 fwrite(new_cf, paste0("data/new_",YEAR,"_cf.csv"))
