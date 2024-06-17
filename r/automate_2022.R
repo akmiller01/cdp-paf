@@ -124,6 +124,7 @@ crs$`Crisis finance identified`[
   which(
     crs$purpose_code %in% c(
       12264 # COVID-19 control - 
+      ,15220 # Civilian peace-building, conflict prevention and resolution - 
       ,15240 # Reintegration and SALW control - 
       ,15250 # Removal of land mines and explosive remnants of war - ,
       ,15261 # Child soldiers (prevention and demobilisation) - 
@@ -189,7 +190,6 @@ crs$`Crisis finance eligible`[
       ,15170 # Women’s rights organisations and movements, and government institutions - 
       ,15190 # Facilitation of orderly, safe, regular and responsible migration and mobility - 
       ,152 # Conflict, Peace & Security - 
-      ,15220 # Civilian peace-building, conflict prevention and resolution - 
       ,160 # Other Social Infrastructure & Services - 
       ,16010 # Social Protection - 
       ,16020 # Employment creation - 
