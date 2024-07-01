@@ -82,6 +82,7 @@ enhance = function(df){
   
   df = merge(df, oecd_fcas, by="recipient_iso3_code", all.x=T)
   df$oecd_fcas[which(is.na(df$oecd_fcas))] = 0
+  df$oecd_sids[which(is.na(df$oecd_sids))] = 0
   
   df = merge(df, wb_fcas, by="recipient_iso3_code", all.x=T)
   df$wb_fcas[which(is.na(df$wb_fcas))] = 0
@@ -109,7 +110,7 @@ generate_contingent_financing = function(df){
   iadb = df$donor_name == "Inter-American Development Bank"
   relevant_donor = ibrd | ida | adb | iadb
   
-  ddo_keywords = c("ddo","deferred drawdown")
+  ddo_keywords = c("ddo","deferred drawdown", "deferred draw down")
   dri_keywords = c("disaster resilience program", "disaster resilience improvement program")
   ccf_keywords = c("contingent loan")
   contingent_keywords = c(
