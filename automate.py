@@ -16,7 +16,7 @@ def collapse_whitespace(string):
 
 # Load data
 crs = pd.read_csv(f"large_data/crs_{YEAR}_predictions.csv")
-original_names = crs.columns.tolist()
+original_names = crs.columns.tolist()[:95]
 
 #  Remove CERF transactions that have the CERF as a channel rather than as donor
 crs = crs[~((crs['channel_name'] == "Central Emergency Response Fund") & 
@@ -201,15 +201,8 @@ keep_columns = original_names + [
     'Part confidence ML'
 ]
 
-# Sort the dataframe similar to how it's done in R
-crs = crs.sort_values(
-    by=[
-        crs['Crisis finance determination'] == "No",
-        crs['Crisis finance determination'] == "Review",
-        crs['Crisis finance determination'] == "Yes",
-        -crs['Crisis finance confidence ML']
-    ]
-)[keep_columns]
+# Keep only certain columns
+crs = crs[keep_columns]
 
 # Save the final result to CSV
 output_file = f"large_data/crs_{YEAR}_cdp_automated_py.csv"
