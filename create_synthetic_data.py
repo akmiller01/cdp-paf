@@ -48,7 +48,7 @@ if __name__ == '__main__':
     dataset = dataset.add_column("class_labels", dataset['labels'])
 
     dataset = dataset.class_encode_column('class_labels').train_test_split(
-        test_size=0.5,
+        test_size=0.7,
         stratify_by_column="class_labels",
         shuffle=True,
         seed=42
