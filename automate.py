@@ -1,13 +1,8 @@
-import os
 import re
 import pandas as pd
 
 # Define the year
 YEAR = 2022
-
-# Set working directory
-wd = "~/git/cdp-paf/"
-os.chdir(wd)
 
 # Utility functions for string processing
 def quotemeta(string):
@@ -21,7 +16,7 @@ def collapse_whitespace(string):
 
 # Load data
 crs = pd.read_csv(f"large_data/crs_{YEAR}_predictions.csv")
-original_names = crs.columns
+original_names = crs.columns.tolist()
 
 #  Remove CERF transactions that have the CERF as a channel rather than as donor
 crs = crs[~((crs['channel_name'] == "Central Emergency Response Fund") & 
